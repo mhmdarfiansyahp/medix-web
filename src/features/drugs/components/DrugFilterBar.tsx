@@ -23,7 +23,6 @@ export function DrugFilterBar({
     return (
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm mb-6">
             <div className="flex flex-col md:flex-row items-center gap-3">
-                {/* Search Bar */}
                 <div className="relative flex-1 w-full">
                     <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
@@ -35,7 +34,6 @@ export function DrugFilterBar({
                     />
                 </div>
 
-                {/* Category Filter */}
                 <div className="w-full md:w-56">
                     <select
                         value={selectedCategory}
@@ -51,7 +49,6 @@ export function DrugFilterBar({
                     </select>
                 </div>
 
-                {/* Stock Status Filter */}
                 <div className="w-full md:w-48">
                     <select
                         value={selectedStockStatus}

@@ -1,4 +1,3 @@
-// src/features/dashboard/components/AddMedicationModal.tsx
 import { useEffect, useState } from 'react';
 import { AlertCircle, Barcode, Calendar, Package, X } from 'lucide-react';
 import { cn } from '../../../utils/utils';
@@ -38,7 +37,6 @@ export function AddMedicationModal({
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    // Format tanggal ke YYYY-MM-DD agar dibaca oleh input type="date"
     const formatDateForInput = (dateString?: string) => {
         if (!dateString) return '';
         if (dateString.includes('T')) {
@@ -99,7 +97,6 @@ export function AddMedicationModal({
         }
 
         try {
-            // Ambil ID Obat dari id_obat atau id
             const targetId = initialData?.id_obat ?? (initialData as any)?.id;
 
             const payload = {
@@ -116,13 +113,11 @@ export function AddMedicationModal({
             };
 
             if (isEditMode && targetId) {
-                // UPDATE (PUT/PATCH)
                 await medicineService.update(targetId, payload);
-                showSuccessToast(`Obat "${formData.nama_obat}" berhasil diperbarui.`);
+                showSuccessToast(`Obat berhasil diperbarui.`);
             } else {
-                // CREATE (POST)
                 await medicineService.create(payload);
-                showSuccessToast(`Obat "${formData.nama_obat}" berhasil ditambahkan.`);
+                showSuccessToast(`Obat berhasil ditambahkan.`);
             }
 
             if (onSuccess) onSuccess();

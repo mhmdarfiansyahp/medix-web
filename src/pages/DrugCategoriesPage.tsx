@@ -73,10 +73,10 @@ export default function DrugCategoriesPage() {
             const targetId = selectedCategoryForEdit?.id ?? selectedCategoryForEdit?.id_jenis;
             if (selectedCategoryForEdit && targetId) {
                 await typeDrugService.update(targetId, formData);
-                showSuccessToast(`Category "${formData.nama_jenis}" updated successfully.`);
+                showSuccessToast(`Category updated successfully.`);
             } else {
                 await typeDrugService.create(formData);
-                showSuccessToast(`Category "${formData.nama_jenis}" created successfully.`);
+                showSuccessToast(`Category created successfully.`);
             }
             setIsModalOpen(false);
             setSelectedCategoryForEdit(null);

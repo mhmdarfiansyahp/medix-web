@@ -30,7 +30,6 @@ export function CategoryModal({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!namaJenis.trim()) return;
-
         onSubmit({
             nama_jenis: namaJenis.trim(),
         });

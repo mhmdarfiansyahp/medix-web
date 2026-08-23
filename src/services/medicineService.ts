@@ -54,13 +54,13 @@ export const medicineService = {
         return res.data!;
     },
 
-    toggleStatus: async (id: number | string): Promise<Drug> => {
+    toggleStatus: async (id: number | string, isActive: boolean): Promise<Drug> => {
         const res = await fetchClient<ApiResponse<Drug>>(`${ENDPOINT}/${id}/status`, {
             method: 'PATCH',
+            body: JSON.stringify({ is_active: isActive })
         });
         return res.data!;
     },
-
     delete: async (id: number | string): Promise<void> => {
         await fetchClient<ApiResponse<null>>(`${ENDPOINT}/${id}`, {
             method: 'DELETE',

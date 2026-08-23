@@ -16,7 +16,7 @@ export interface PaginationMeta {
 
 export const useMedicines = (initialParams?: DrugFilterParams) => {
     const [items, setItems] = useState<Drug[]>([]);
-    const [pagination, setPagination] = useState<PaginationMeta>({
+    const [pagination] = useState<PaginationMeta>({
         currentPage: 1,
         totalPages: 1,
         totalItems: 0,
@@ -61,11 +61,12 @@ export const useMedicines = (initialParams?: DrugFilterParams) => {
         return updated;
     };
 
-    const toggleStatus = async (id: number | string) => {
-        const updated = await medicineService.toggleStatus(id);
-        await fetchAll(params);
-        return updated;
-    };
+// Tambahkan parameter isActive: boolean
+const toggleStatus = async (id: number | string, isActive: boolean) => {
+    const updated = await medicineService.toggleStatus(id, isActive);
+    await fetchAll(params);
+    return updated;
+};
 
     const deleteItem = async (id: number | string) => {
         await medicineService.delete(id);
