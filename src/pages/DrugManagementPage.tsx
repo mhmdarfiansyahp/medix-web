@@ -53,12 +53,11 @@ export default function DrugManagementPage() {
 
   const handleToggleStatus = async (drug: Drug) => {
     const isCurrentlyActive = Number(drug.status) === 1;
-    const nextStatus = !isCurrentlyActive; // true jika mau diaktifkan, false jika mau dinonaktifkan
+    const nextStatus = !isCurrentlyActive;
     const actionText = nextStatus ? "mengaktifkan" : "menonaktifkan";
 
     try {
       await toggleStatus(drug.id_obat, nextStatus);
-
       showSuccessToast(`Obat "${drug.nama_obat}" berhasil di-${actionText}.`);
     } catch (error: any) {
       showErrorToast(error?.message || `Gagal ${actionText} data obat.`);

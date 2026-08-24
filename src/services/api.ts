@@ -14,6 +14,5 @@ export const fetchClient = async <T>(endpoint: string, options?: RequestInit): P
     if (!response.ok) {
         throw new Error(data.error || 'Terjadi kesalahan pada server');
     }
-
     return data;
 };
