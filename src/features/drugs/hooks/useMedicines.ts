@@ -26,7 +26,6 @@ export const useMedicines = (initialParams?: DrugFilterParams) => {
     const [error, setError] = useState<string | null>(null);
     const [params, setParams] = useState<DrugFilterParams | undefined>(initialParams);
 
-    // Fetch data menerima param secara eksplisit
     const fetchAll = useCallback(async (overrideParams?: DrugFilterParams) => {
         setLoading(true);
         setError(null);
@@ -44,7 +43,6 @@ export const useMedicines = (initialParams?: DrugFilterParams) => {
         }
     }, [params]);
 
-    // Refetch otomatis ketika params berubah
     useEffect(() => {
         fetchAll(params);
     }, [params]);
@@ -61,12 +59,11 @@ export const useMedicines = (initialParams?: DrugFilterParams) => {
         return updated;
     };
 
-// Tambahkan parameter isActive: boolean
-const toggleStatus = async (id: number | string, isActive: boolean) => {
-    const updated = await medicineService.toggleStatus(id, isActive);
-    await fetchAll(params);
-    return updated;
-};
+    const toggleStatus = async (id: number | string, isActive: boolean) => {
+        const updated = await medicineService.toggleStatus(id, isActive);
+        await fetchAll(params);
+        return updated;
+    };
 
     const deleteItem = async (id: number | string) => {
         await medicineService.delete(id);

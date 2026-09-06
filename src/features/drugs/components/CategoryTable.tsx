@@ -1,5 +1,5 @@
-import { Edit2, Trash2, FolderKanban, ChevronLeft, ChevronRight } from 'lucide-react';
-import type { TypeDrug } from '../types/Category.types';
+import { Edit2, Trash2, FolderKanban, ChevronLeft, ChevronRight } from "lucide-react";
+import type { TypeDrug } from "../types/Category.types";
 
 interface CategoryTableProps {
     categories: TypeDrug[];
@@ -28,18 +28,19 @@ export function CategoryTable({
     return (
         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-slate-50/80 border-b border-slate-200/80 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                            <th className="px-6 py-4 w-16 text-center">No</th>
-                            <th className="px-6 py-4">Category Name</th>
-                            <th className="px-6 py-4 text-right">Actions</th>
+                <table className="w-full text-left text-sm text-slate-600 border-collapse">
+                    {/* Header disamakan dengan DrugTable */}
+                    <thead className="bg-[#eef2f6] text-[11px] font-bold text-slate-600 uppercase tracking-wider border-b border-slate-200">
+                        <tr>
+                            <th className="py-3 px-4 w-16 text-center">No</th>
+                            <th className="py-3 px-4">Category Name</th>
+                            <th className="py-3 px-4 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 text-sm">
+                    <tbody className="divide-y divide-slate-100">
                         {categories.length === 0 ? (
                             <tr>
-                                <td colSpan={3} className="px-6 py-12 text-center text-slate-400">
+                                <td colSpan={3} className="text-center py-8 text-slate-400">
                                     <FolderKanban className="w-10 h-10 mx-auto mb-2 text-slate-300" />
                                     No drug category data available.
                                 </td>
@@ -50,24 +51,31 @@ export function CategoryTable({
                                 const categoryId = category.id ?? category.id_jenis;
 
                                 return (
-                                    <tr key={categoryId || index} className="hover:bg-slate-50/50 transition-colors">
-                                        <td className="px-6 py-4 text-center font-medium text-slate-500">
+                                    <tr
+                                        key={categoryId || index}
+                                        className="hover:bg-slate-50/80 transition-colors"
+                                    >
+                                        <td className="py-3.5 px-4 text-center font-medium text-slate-500 align-middle">
                                             {rowNumber}
                                         </td>
-                                        <td className="px-6 py-4 font-semibold text-slate-800">
+                                        <td className="py-3.5 px-4 font-semibold text-slate-900 align-middle">
                                             {category.nama_jenis}
                                         </td>
-                                        <td className="px-6 py-4 text-right space-x-1">
+                                        <td className="py-3.5 px-4 text-right space-x-1 align-middle">
+                                            {/* Tombol Edit disamakan warna bawaannya */}
                                             <button
+                                                type="button"
                                                 onClick={() => onEdit(category)}
-                                                className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                 title="Edit Category"
                                             >
                                                 <Edit2 className="w-4 h-4" />
                                             </button>
+                                            {/* Tombol Delete diselaraskan styling-nya */}
                                             <button
+                                                type="button"
                                                 onClick={() => onDelete(category)}
-                                                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                                className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                                                 title="Delete Category"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -81,30 +89,37 @@ export function CategoryTable({
                 </table>
             </div>
 
+            {/* Pagination Footer disamakan presisi */}
             <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-slate-500">
                 <div>
-                    Showing <span className="font-semibold text-slate-800">{startItem}</span> - {' '}
-                    <span className="font-semibold text-slate-800">{endItem}</span> of{' '}
-                    <span className="font-semibold text-slate-800">{totalItems}</span> entries
+                    Showing{" "}
+                    <span className="font-semibold text-slate-800">{startItem}</span> -{" "}
+                    <span className="font-semibold text-slate-800">{endItem}</span> of{" "}
+                    <span className="font-semibold text-slate-800">{totalItems}</span>{" "}
+                    entries
                 </div>
 
                 <div className="flex items-center space-x-2">
                     <button
+                        type="button"
                         onClick={() => onPageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className="p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        title="Previous Page"
+                        className="p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
                     >
                         <ChevronLeft className="w-4 h-4" />
                     </button>
 
-                    <span className="px-3 py-1 bg-white border border-slate-200 rounded-xl text-slate-700 font-semibold">
+                    <span className="px-3.5 py-1.5 bg-white border border-slate-200 rounded-xl text-slate-700 font-semibold shadow-sm select-none">
                         {currentPage} / {totalPages || 1}
                     </span>
 
                     <button
+                        type="button"
                         onClick={() => onPageChange(currentPage + 1)}
                         disabled={currentPage >= totalPages || totalPages === 0}
-                        className="p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        title="Next Page"
+                        className="p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
                     >
                         <ChevronRight className="w-4 h-4" />
                     </button>

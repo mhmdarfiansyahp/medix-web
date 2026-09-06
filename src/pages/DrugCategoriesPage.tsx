@@ -103,8 +103,7 @@ export default function DrugCategoriesPage() {
                         setSelectedCategoryForEdit(null);
                         setIsModalOpen(true);
                     }}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/20 shrink-0 self-start sm:self-auto"
-                >
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/20 shrink-0 self-start sm:self-auto">
                     <Plus className="w-4 h-4" />
                     Add Category
                 </button>

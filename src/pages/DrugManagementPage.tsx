@@ -54,13 +54,13 @@ export default function DrugManagementPage() {
   const handleToggleStatus = async (drug: Drug) => {
     const isCurrentlyActive = Number(drug.status) === 1;
     const nextStatus = !isCurrentlyActive;
-    const actionText = nextStatus ? "mengaktifkan" : "menonaktifkan";
+    const actionText = nextStatus ? "activated" : "deactivated";
 
     try {
       await toggleStatus(drug.id_obat, nextStatus);
-      showSuccessToast(`Obat "${drug.nama_obat}" berhasil di-${actionText}.`);
+      showSuccessToast(`Medication "${drug.nama_obat}" has been successfully ${actionText}.`);
     } catch (error: any) {
-      showErrorToast(error?.message || `Gagal ${actionText} data obat.`);
+      showErrorToast(error?.message || `Failed to ${nextStatus ? "activate" : "deactivate"} medication data.`);
     }
   };
 
