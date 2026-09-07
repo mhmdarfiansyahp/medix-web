@@ -160,6 +160,22 @@ class ApiClient {
     delete<T>(endpoint: string, config?: RequestConfig): Promise<T> {
         return this.request<T>('DELETE', endpoint, undefined, config);
     }
+
+    async getBlob(endpoint: string, config?: RequestConfig): Promise<Blob> {
+        const url = buildUrl(`${API_BASE_URL}${endpoint}`, config?.params);
+        const headers = await this.buildHeaders(undefined, config?.headers);
+        const response = await fetch(url, {
+            method: 'GET',
+            headers,
+            ...config,
+        });
+
+        if (!response.ok) {
+            await this.throwApiError(response);
+        }
+
+        return response.blob();
+    }
 }
 
 export const apiClient = new ApiClient();

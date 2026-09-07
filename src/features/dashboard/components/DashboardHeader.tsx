@@ -2,10 +2,14 @@ import { useState } from 'react';
 import { FileText, Plus } from 'lucide-react';
 import { AddMedicationModal } from './AddMedicationModal';
 import { ExportReportModal } from './ExportReportModal';
+import { hasPermission } from '../../../utils/role';
 
 export function DashboardHeader({ role }: { role: 'ADMIN' | 'OWNER' }) {
     const [isAddOpen, setIsAddOpen] = useState(false);
     const [isExportOpen, setIsExportOpen] = useState(false);
+
+    const canManageDrugs = hasPermission('drug-management');
+    const canExportReports = hasPermission('reports');
 
     return (
         <>
@@ -18,16 +22,18 @@ export function DashboardHeader({ role }: { role: 'ADMIN' | 'OWNER' }) {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <button
-                        type="button"
-                        onClick={() => setIsExportOpen(true)}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors shadow-sm"
-                    >
-                        <FileText className="w-4 h-4 text-slate-500" />
-                        Export Report
-                    </button>
+                    {canExportReports && (
+                        <button
+                            type="button"
+                            onClick={() => setIsExportOpen(true)}
+                            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors shadow-sm"
+                        >
+                            <FileText className="w-4 h-4 text-slate-500" />
+                            Export Report
+                        </button>
+                    )}
 
-                    {role === 'ADMIN' && (
+                    {canManageDrugs && (
                         <button
                             type="button"
                             onClick={() => setIsAddOpen(true)}
@@ -41,8 +47,8 @@ export function DashboardHeader({ role }: { role: 'ADMIN' | 'OWNER' }) {
             </div>
 
             {/* Modals */}
-            <AddMedicationModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} />
-            <ExportReportModal isOpen={isExportOpen} onClose={() => setIsExportOpen(false)} />
+            {canManageDrugs && <AddMedicationModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} />}
+            {canExportReports && <ExportReportModal isOpen={isExportOpen} onClose={() => setIsExportOpen(false)} />}
         </>
     );
 }

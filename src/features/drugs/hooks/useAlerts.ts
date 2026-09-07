@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { LowStockDrug, ExpiringDrug, AlertSummary } from '../types/Drug.types';
 import { medicineService } from '../../../services/medicineService';
-import { getErrorMessage } from '../../../utils/api-helpers';
 
 export interface UseAlertsReturn {
     lowStock: LowStockDrug[];
@@ -22,21 +21,25 @@ export const useAlerts = (): UseAlertsReturn => {
     const fetchAll = useCallback(async () => {
         setLoading(true);
         setError(null);
-        try {
-            const [lowStockData, expiringData, summaryData] = await Promise.all([
-                medicineService.getLowStock(),
-                medicineService.getExpiring(),
-                medicineService.getAlertSummary(),
-            ]);
 
-            setLowStock(lowStockData ?? []);
-            setExpiring(expiringData ?? []);
-            setSummary(summaryData ?? null);
-        } catch (err: unknown) {
-            setError(getErrorMessage(err, 'Failed to fetch alerts'));
-        } finally {
-            setLoading(false);
+        const [lowRes, expiringRes, summaryRes] = await Promise.allSettled([
+            medicineService.getLowStock(),
+            medicineService.getExpiring(),
+            medicineService.getAlertSummary(),
+        ]);
+
+        setLowStock(lowRes.status === 'fulfilled' ? (lowRes.value ?? []) : []);
+        setExpiring(expiringRes.status === 'fulfilled' ? (expiringRes.value ?? []) : []);
+        setSummary(summaryRes.status === 'fulfilled' ? (summaryRes.value ?? null) : null);
+
+        const failures = [lowRes, expiringRes, summaryRes].filter((r) => r.status === 'rejected');
+        if (failures.length === 3) {
+            setError('Failed to fetch alerts');
+        } else if (failures.length > 0) {
+            console.warn('Some alert endpoints failed:', failures);
         }
+
+        setLoading(false);
     }, []);
 
     useEffect(() => {

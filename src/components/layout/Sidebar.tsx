@@ -11,6 +11,7 @@ import {
     ChevronDown,
     LogOut,
     ClockAlert,
+    ShoppingCart,
 } from 'lucide-react';
 
 import type { NavItem } from '../../types/navigation.types';
@@ -25,6 +26,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
         icon: LayoutDashboard,
         path: '/dashboard',
         permission: 'dashboard',
+    },
+    {
+        id: 'transactions',
+        label: 'Transactions',
+        icon: ShoppingCart,
+        path: '/transactions',
+        permission: 'transactions',
     },
     {
         id: 'drug-management',

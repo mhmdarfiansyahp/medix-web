@@ -1,5 +1,5 @@
 // src/features/dashboard/pages/DashboardPage.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     AlertTriangle,
     ArrowUpRight,
@@ -12,41 +12,39 @@ import {
 } from 'lucide-react';
 import { cn, formatCurrency } from '../utils/utils';
 import { useAlerts } from '../features/drugs/hooks/useAlerts';
+import { reportService } from '../services/reportService';
 
 // Import komponen-komponen Dashboard
 import { DashboardHeader } from '../features/dashboard/components/DashboardHeader';
 import { MedicationTable } from '../features/dashboard/components/MedicationTable';
 import { SalesChart } from '../features/dashboard/components/SalesChart';
-import type {
-    MedicationPerformance,
-    SalesTrend,
-} from '../features/dashboard/types';
+import type { SalesChartData, DrugSalesStat } from '../features/reports/types/report.types';
 
 // DUMMY DATA IN ENGLISH
-const DUMMY_SALES_TRENDS: SalesTrend[] = [
-    { period: 'Day 01', revenue: 3200000, volume: 120 },
-    { period: 'Day 05', revenue: 4500000, volume: 180 },
-    { period: 'Day 10', revenue: 3800000, volume: 140 },
-    { period: 'Day 15', revenue: 5100000, volume: 210 },
-    { period: 'Day 20', revenue: 4200000, volume: 160 },
-    { period: 'Day 25', revenue: 6000000, volume: 250 },
-    { period: 'Day 30', revenue: 5800000, volume: 230 },
+const DUMMY_SALES_TRENDS: SalesChartData[] = [
+    { periode: 'Day 01', total_penjualan: 3200000, jumlah_transaksi: 120 },
+    { periode: 'Day 05', total_penjualan: 4500000, jumlah_transaksi: 180 },
+    { periode: 'Day 10', total_penjualan: 3800000, jumlah_transaksi: 140 },
+    { periode: 'Day 15', total_penjualan: 5100000, jumlah_transaksi: 210 },
+    { periode: 'Day 20', total_penjualan: 4200000, jumlah_transaksi: 160 },
+    { periode: 'Day 25', total_penjualan: 6000000, jumlah_transaksi: 250 },
+    { periode: 'Day 30', total_penjualan: 5800000, jumlah_transaksi: 230 },
 ];
 
-const DUMMY_TOP_MEDICATIONS: MedicationPerformance[] = [
-    { id: '1', name: 'Paracetamol 500mg', sku: 'PRC-500-A1', category: 'Analgesic', unitsSold: 1240, revenue: 15500000, status: 'IN STOCK' },
-    { id: '2', name: 'Amoxicillin 250mg', sku: 'AMX-250-B4', category: 'Antibiotic', unitsSold: 856, revenue: 21400000, status: 'LOW STOCK' },
-    { id: '3', name: 'Ibuprofen 400mg', sku: 'IBU-400-C2', category: 'NSAID', unitsSold: 742, revenue: 11130000, status: 'IN STOCK' },
-    { id: '4', name: 'Omeprazole 20mg', sku: 'OMP-20-D9', category: 'PPI', unitsSold: 610, revenue: 18300000, status: 'IN STOCK' },
-    { id: '5', name: 'Azithromycin 250mg', sku: 'AZI-250-E1', category: 'Antibiotic', unitsSold: 430, revenue: 17200000, status: 'OUT OF STOCK' },
+const DUMMY_TOP_MEDICATIONS: DrugSalesStat[] = [
+    { id_obat: 1, nama_obat: 'Paracetamol 500mg', total_terjual: 1240, total_omset: 15500000 },
+    { id_obat: 2, nama_obat: 'Amoxicillin 250mg', total_terjual: 856, total_omset: 21400000 },
+    { id_obat: 3, nama_obat: 'Ibuprofen 400mg', total_terjual: 742, total_omset: 11130000 },
+    { id_obat: 4, nama_obat: 'Omeprazole 20mg', total_terjual: 610, total_omset: 18300000 },
+    { id_obat: 5, nama_obat: 'Azithromycin 250mg', total_terjual: 430, total_omset: 17200000 },
 ];
 
-const DUMMY_BOTTOM_MEDICATIONS: MedicationPerformance[] = [
-    { id: '10', name: 'Multivitamin Syrup 60ml', sku: 'VIT-060-S1', category: 'Vitamin', unitsSold: 2, revenue: 90000, status: 'IN STOCK' },
-    { id: '11', name: 'Antacid Liquid 100ml', sku: 'ANT-100-L2', category: 'Antacid', unitsSold: 5, revenue: 175000, status: 'IN STOCK' },
-    { id: '12', name: 'Cetirizine 10mg', sku: 'CTZ-010-T3', category: 'Antihistamine', unitsSold: 8, revenue: 240000, status: 'LOW STOCK' },
-    { id: '13', name: 'Cough Syrup 100ml', sku: 'CGH-100-S4', category: 'Cough', unitsSold: 12, revenue: 480000, status: 'IN STOCK' },
-    { id: '14', name: 'Vitamin C 500mg', sku: 'VTC-500-T5', category: 'Vitamin', unitsSold: 15, revenue: 300000, status: 'IN STOCK' },
+const DUMMY_BOTTOM_MEDICATIONS: DrugSalesStat[] = [
+    { id_obat: 10, nama_obat: 'Multivitamin Syrup 60ml', total_terjual: 2, total_omset: 90000 },
+    { id_obat: 11, nama_obat: 'Antacid Liquid 100ml', total_terjual: 5, total_omset: 175000 },
+    { id_obat: 12, nama_obat: 'Cetirizine 10mg', total_terjual: 8, total_omset: 240000 },
+    { id_obat: 13, nama_obat: 'Cough Syrup 100ml', total_terjual: 12, total_omset: 480000 },
+    { id_obat: 14, nama_obat: 'Vitamin C 500mg', total_terjual: 15, total_omset: 300000 },
 ];
 
 
@@ -54,6 +52,19 @@ const DUMMY_BOTTOM_MEDICATIONS: MedicationPerformance[] = [
 export default function DashboardPage() {
     const [currentUserRole] = useState<'ADMIN' | 'OWNER'>('ADMIN');
     const { lowStock, expiring, summary } = useAlerts();
+    const [salesChartData, setSalesChartData] = useState<SalesChartData[]>(DUMMY_SALES_TRENDS);
+
+    useEffect(() => {
+        const fetchSales = async () => {
+            try {
+                const res = await reportService.getSalesSummary({ group_by: 'monthly' });
+                setSalesChartData(res.chart_data ?? DUMMY_SALES_TRENDS);
+            } catch {
+                setSalesChartData(DUMMY_SALES_TRENDS);
+            }
+        };
+        fetchSales();
+    }, []);
 
     const dashboardAlerts = [
         ...lowStock.slice(0, 2).map(item => ({
@@ -132,7 +143,7 @@ export default function DashboardPage() {
 
             {/* 3. Chart & Inventory Sidebar Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <SalesChart data={DUMMY_SALES_TRENDS} />
+                <SalesChart data={salesChartData} />
 
                 {/* Inventory Alerts Sidebar */}
                 <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">

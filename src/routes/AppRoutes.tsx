@@ -8,6 +8,9 @@ import DashboardPage from '../pages/DashboardPage';
 import DrugManagementPage from '../pages/DrugManagementPage';
 import DrugCategoriesPage from '../pages/DrugCategoriesPage';
 import StockAlertsPage from '../pages/StockAlertsPage';
+import ReportsPage from '../pages/ReportsPage';
+import TransactionsPage from '../pages/TransactionsPage';
+import SettingsPage from '../pages/SettingsPage';
 import UsersPage from '../pages/UsersPage';
 
 export default function AppRoutes() {
@@ -33,6 +36,21 @@ export default function AppRoutes() {
                     <Route path="/stock-alerts/low-stock" element={<StockAlertsPage />} />
                     <Route path="/stock-alerts/expiring-soon" element={<StockAlertsPage />} />
                     <Route path='/users' element={<UsersPage />} />
+                </Route>
+            </Route>
+
+            {/* Admin + Owner routes */}
+            <Route element={<ProtectedRoute allowedRoles={['admin', 'owner']} />}>
+                <Route element={<MainLayout />}>
+                    <Route path="/reports" element={<ReportsPage />} />
+                </Route>
+            </Route>
+
+            {/* Admin + Kasir + Owner routes (transactions & settings) */}
+            <Route element={<ProtectedRoute allowedRoles={['admin', 'kasir', 'owner']} />}>
+                <Route element={<MainLayout />}>
+                    <Route path="/transactions" element={<TransactionsPage />} />
+                    <Route path="/settings" element={<SettingsPage />} />
                 </Route>
             </Route>
 

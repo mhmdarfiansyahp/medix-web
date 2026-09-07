@@ -1,6 +1,8 @@
 // src/features/dashboard/components/ExportReportModal.tsx
 import { useState } from 'react';
-import { Download, FileSpreadsheet, X } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, X } from 'lucide-react';
+import { reportService } from '../../../services/reportService';
+import { showSuccessToast, showErrorToast } from '../../../utils/sweetalert';
 
 interface ExportReportModalProps {
     isOpen: boolean;
@@ -8,15 +10,58 @@ interface ExportReportModalProps {
 }
 
 export function ExportReportModal({ isOpen, onClose }: ExportReportModalProps) {
+    const [isLoading, setIsLoading] = useState(false);
     const [format, setFormat] = useState<'excel' | 'pdf'>('excel');
     const [range, setRange] = useState('this_month');
+    const [customStart, setCustomStart] = useState('');
+    const [customEnd, setCustomEnd] = useState('');
 
     if (!isOpen) return null;
 
-    const handleExport = () => {
-        console.log(`Exporting report as ${format.toUpperCase()} for ${range}`);
-        // Panggil Service API Download di sini
-        onClose();
+    const handleExport = async () => {
+        setIsLoading(true);
+
+        const today = new Date();
+        let start_date: string | undefined;
+        let end_date: string | undefined;
+
+        if (range === 'today') {
+            start_date = today.toISOString().split('T')[0];
+            end_date = start_date;
+        } else if (range === 'this_week') {
+            const weekAgo = new Date(today);
+            weekAgo.setDate(today.getDate() - 7);
+            start_date = weekAgo.toISOString().split('T')[0];
+            end_date = today.toISOString().split('T')[0];
+        } else if (range === 'this_month') {
+            start_date = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`;
+            end_date = today.toISOString().split('T')[0];
+        } else if (range === 'custom' && customStart && customEnd) {
+            start_date = customStart;
+            end_date = customEnd;
+        }
+
+        try {
+            const blob = format === 'excel'
+                ? await reportService.exportExcel({ start_date, end_date })
+                : await reportService.exportPDF({ start_date, end_date });
+
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const ext = format === 'excel' ? 'xlsx' : 'pdf';
+            link.download = `Laporan_Penjualan_${new Date().toISOString().split('T')[0]}.${ext}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            showSuccessToast(`Laporan berhasil diunduh (${ext.toUpperCase()}).`);
+            onClose();
+        } catch (err: unknown) {
+            showErrorToast(err instanceof Error ? err.message : 'Gagal mengunduh laporan.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -49,6 +94,29 @@ export function ExportReportModal({ isOpen, onClose }: ExportReportModalProps) {
                         </select>
                     </div>
 
+                    {range === 'custom' && (
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-700">Start Date</label>
+                                <input
+                                    type="date"
+                                    value={customStart}
+                                    onChange={(e) => setCustomStart(e.target.value)}
+                                    className="w-full px-3.5 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-700">End Date</label>
+                                <input
+                                    type="date"
+                                    value={customEnd}
+                                    onChange={(e) => setCustomEnd(e.target.value)}
+                                    className="w-full px-3.5 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
+                    )}
+
                     <div className="space-y-1">
                         <label className="text-xs font-bold text-slate-700">Format</label>
                         <div className="grid grid-cols-2 gap-3">
@@ -60,6 +128,7 @@ export function ExportReportModal({ isOpen, onClose }: ExportReportModalProps) {
                                         : 'border-slate-200 text-slate-600'
                                     }`}
                             >
+                                <FileSpreadsheet className="w-4 h-4 mx-auto mb-1" />
                                 Excel (.xlsx)
                             </button>
                             <button
@@ -70,6 +139,7 @@ export function ExportReportModal({ isOpen, onClose }: ExportReportModalProps) {
                                         : 'border-slate-200 text-slate-600'
                                     }`}
                             >
+                                <FileText className="w-4 h-4 mx-auto mb-1" />
                                 PDF (.pdf)
                             </button>
                         </div>
@@ -85,10 +155,11 @@ export function ExportReportModal({ isOpen, onClose }: ExportReportModalProps) {
                     </button>
                     <button
                         onClick={handleExport}
-                        className="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl inline-flex items-center gap-1.5"
+                        disabled={isLoading}
+                        className="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl inline-flex items-center gap-1.5 disabled:opacity-50"
                     >
                         <Download className="w-4 h-4" />
-                        Download
+                        {isLoading ? 'Downloading...' : `Download ${format.toUpperCase()}`}
                     </button>
                 </div>
             </div>
