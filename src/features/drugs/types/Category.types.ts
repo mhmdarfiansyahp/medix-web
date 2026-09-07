@@ -12,8 +12,3 @@ export interface UpdateTypeDrugRequest {
     nama_jenis: string;
 }
 
-export interface ApiResponse<T> {
-    message?: string;
-    data?: T;
-    error?: string;
-}

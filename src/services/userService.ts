@@ -1,83 +1,70 @@
-import { fetchClient } from './api';
-
+import { apiClient } from './api';
 import type {
     User,
     CreateUserRequest,
     UpdateUserRequest,
-    ApiResponse,
-    UserPagination,
-    UserFilterParams
+    UserFilterParams,
+    UserListResponse,
 } from '../features/users/types/user.types';
+import type { PaginatedResponse } from '../types/api.types';
+import { encodePathParam, normalizePagination } from '../utils/api-helpers';
 
 const ENDPOINT = '/users';
 
 export const userService = {
-    getAll: async (params?: UserFilterParams):
-        Promise<{
-            data: User[];
-            pagination: UserPagination;
-        }> => {
-        const query = new URLSearchParams();
+    getAll: async (params?: UserFilterParams): Promise<PaginatedResponse<User>> => {
+        const res = await apiClient.get<{
+            status: string;
+            message: string;
+            data?: UserListResponse;
+        }>(ENDPOINT, { params: params as Record<string, unknown> });
 
-        if (params) {
-            Object.entries(params).forEach(([key, value]) => {
-                if (
-                    value !== undefined &&
-                    value !== null &&
-                    value !== ""
-                ) {
-                    query.append(key, String(value));
-                }
-            });
-        }
-
-        const queryString = query.toString();
-
-        const url = queryString
-            ? `${ENDPOINT}?${queryString}`
-            : ENDPOINT;
-
-        const res = await fetchClient<{
-            message?: string;
-            data: User[];
-            pagination: UserPagination;
-        }>(url);
+        const data = res.data || { data: [], pagination: { current_page: 1, total_pages: 1, total_items: 0, items_per_page: 10 } };
 
         return {
-            data: res.data || [],
-            pagination: res.pagination,
+            data: data.data || [],
+            pagination: normalizePagination(
+                data.pagination,
+                {
+                    currentPage: params?.page,
+                    itemsPerPage: params?.limit,
+                    totalItems: data.data?.length ?? 0,
+                }
+            ),
         };
     },
 
     getById: async (id: number | string): Promise<User> => {
-        const res = await fetchClient<ApiResponse<User>>(`${ENDPOINT}/${id}`);
-        return res.data!;
+        const res = await apiClient.get<{
+            status: string;
+            message: string;
+            data?: User;
+        }>(`${ENDPOINT}/${encodePathParam(id)}`);
+        if (!res.data) throw new Error('User tidak ditemukan');
+        return res.data;
     },
 
     create: async (payload: CreateUserRequest): Promise<User> => {
-        const res = await fetchClient<ApiResponse<User>>(ENDPOINT, {
-            method: 'POST',
-            body: JSON.stringify(payload),
-        });
-
-        return res.data!;
+        const res = await apiClient.post<{
+            status: string;
+            message: string;
+            data?: User;
+        }>(ENDPOINT, payload);
+        if (!res.data) throw new Error('Gagal membuat user');
+        return res.data;
     },
 
-    update: async (
-        id: number | string,
-        payload: UpdateUserRequest
-    ): Promise<User> => {
-        const res = await fetchClient<ApiResponse<User>>(`${ENDPOINT}/${id}`, {
-            method: 'PUT',
-            body: JSON.stringify(payload),
-        });
-
-        return res.data!;
+    update: async (id: number | string, payload: UpdateUserRequest): Promise<User> => {
+        const res = await apiClient.put<{
+            status: string;
+            message: string;
+            data?: User;
+        }>(`${ENDPOINT}/${encodePathParam(id)}`, payload);
+        if (!res.data) throw new Error('Gagal memperbarui user');
+        return res.data;
     },
 
     delete: async (id: number | string): Promise<void> => {
-        await fetchClient<ApiResponse<null>>(`${ENDPOINT}/${id}`, {
-            method: 'DELETE',
-        });
+        await apiClient.delete(`${ENDPOINT}/${encodePathParam(id)}`);
     },
 };

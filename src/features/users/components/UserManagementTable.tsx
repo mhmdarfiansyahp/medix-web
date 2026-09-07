@@ -2,6 +2,7 @@ import React from "react";
 import {
     ChevronLeft,
     ChevronRight,
+    Users,
 } from "lucide-react";
 import {
     Edit3,
@@ -11,7 +12,7 @@ import {
     Store,
 } from "lucide-react";
 
-import type { User } from "../types/user.types";
+import { isUserActive, type User } from "../types/user.types";
 
 interface UserTableProps {
     users: User[];
@@ -85,7 +86,7 @@ export const UserTable: React.FC<UserTableProps> = ({
     };
 
     const renderStatusBadge = (status: User["status"]) => {
-        if (status === "aktif") {
+        if (isUserActive(status)) {
             return (
                 <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -104,7 +105,7 @@ export const UserTable: React.FC<UserTableProps> = ({
 
     if (isLoading) {
         return (
-            <div className="bg-white rounded-xl border border-slate-200 p-10 text-center text-sm text-slate-500">
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-12 text-center text-sm text-slate-400">
                 Loading users...
             </div>
         );
@@ -112,17 +113,17 @@ export const UserTable: React.FC<UserTableProps> = ({
 
     if (error) {
         return (
-            <div className="bg-white rounded-xl border border-slate-200 p-10 text-center text-sm text-red-500">
+            <div className="bg-rose-50 text-rose-700 px-4 py-3 rounded-xl border border-rose-100 text-sm">
                 {error}
             </div>
         );
     }
 
     return (
-        <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                    <thead className="bg-slate-50/70 text-slate-500 font-medium border-b border-slate-100">
+                <table className="w-full text-left text-sm text-slate-600 border-collapse">
+                    <thead className="bg-[#eef2f6] text-[11px] font-bold text-slate-600 uppercase tracking-wider border-b border-slate-200">
                         <tr>
                             <th className="py-3.5 px-6">User Details</th>
                             <th className="py-3.5 px-6">Role</th>
@@ -136,7 +137,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                         {users.map((user) => (
                             <tr
                                 key={user.id_user}
-                                className="hover:bg-slate-50/50 transition"
+                                className="hover:bg-slate-50/80 transition-colors"
                             >
                                 <td className="py-4 px-6">
                                     <div className="flex items-center gap-3">
@@ -172,7 +173,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                                     <div className="inline-flex items-center gap-1">
                                         <button
                                             onClick={() => onEdit(user)}
-                                            className="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition"
+                                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                             title="Edit user"
                                         >
                                             <Edit3 className="w-4 h-4" />
@@ -180,7 +181,7 @@ export const UserTable: React.FC<UserTableProps> = ({
 
                                         <button
                                             onClick={() => onDelete(user)}
-                                            className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                                            className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                                             title="Delete user"
                                         >
                                             <Trash2 className="w-4 h-4" />
@@ -237,6 +238,7 @@ export const UserTable: React.FC<UserTableProps> = ({
 
             {users.length === 0 && (
                 <div className="py-12 text-center text-sm text-slate-500">
+                    <Users className="w-10 h-10 mx-auto mb-2 text-slate-300" />
                     No users found.
                 </div>
             )}

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 
-import type {
-    User,
-    UserRole,
-    UserStatus,
-    CreateUserRequest,
-    UpdateUserRequest,
+import {
+    isUserActive,
+    type User,
+    type UserRole,
+    type UserStatus,
+    type CreateUserRequest,
+    type UpdateUserRequest,
 } from "../types/user.types";
 
 interface UserModalProps {
@@ -48,7 +49,7 @@ export const UserModal: React.FC<UserModalProps> = ({
             setNoTelp(initialData.no_telp || "");
             setRole(initialData.role);
             setUsername(initialData.username);
-            setStatus(initialData.status);
+            setStatus(isUserActive(initialData.status) ? "aktif" : "nonaktif");
             setPassword("");
         } else {
             setNamaUser("");
@@ -73,13 +74,15 @@ export const UserModal: React.FC<UserModalProps> = ({
         setError(null);
 
         try {
+            const statusNumber = status === "aktif" ? 1 : 0;
+
             if (isEdit && initialData) {
                 const payload: UpdateUserRequest = {
                     nama_user: namaUser,
                     no_telp: noTelp || null,
                     role,
                     username,
-                    status,
+                    status: statusNumber,
                 };
 
                 if (password.trim()) {
@@ -94,7 +97,7 @@ export const UserModal: React.FC<UserModalProps> = ({
                     role,
                     username,
                     password,
-                    status,
+                    status: statusNumber,
                 };
 
                 await createUser(payload);

@@ -14,6 +14,7 @@ export default function DrugManagementPage() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedStockStatus, setSelectedStockStatus] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,6 +26,7 @@ export default function DrugManagementPage() {
   const {
     items: drugs,
     loading: drugsLoading,
+    pagination,
     setParams,
     toggleStatus,
     refetch,
@@ -39,12 +41,16 @@ export default function DrugManagementPage() {
       limit: 10,
       search: search.trim() || undefined,
       jenis_obat_id: selectedCategory ? Number(selectedCategory) : undefined,
-      stock_status:
+      status_stok:
         selectedStockStatus && selectedStockStatus !== "all"
           ? selectedStockStatus
           : undefined,
+      status:
+        selectedStatus && selectedStatus !== "all"
+          ? selectedStatus
+          : undefined,
     });
-  }, [search, selectedCategory, selectedStockStatus, currentPage, setParams]);
+  }, [search, selectedCategory, selectedStockStatus, selectedStatus, currentPage, setParams]);
 
   const handleEdit = (drug: Drug) => {
     setSelectedDrugForEdit(drug);
@@ -59,8 +65,12 @@ export default function DrugManagementPage() {
     try {
       await toggleStatus(drug.id_obat, nextStatus);
       showSuccessToast(`Medication "${drug.nama_obat}" has been successfully ${actionText}.`);
-    } catch (error: any) {
-      showErrorToast(error?.message || `Failed to ${nextStatus ? "activate" : "deactivate"} medication data.`);
+    } catch (error: unknown) {
+      showErrorToast(
+        error instanceof Error
+          ? error.message
+          : `Failed to ${nextStatus ? "activate" : "deactivate"} medication data.`
+      );
     }
   };
 
@@ -76,6 +86,11 @@ export default function DrugManagementPage() {
 
   const handleStockStatusChange = (value: string) => {
     setSelectedStockStatus(value);
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (value: string) => {
+    setSelectedStatus(value);
     setCurrentPage(1);
   };
 
@@ -119,6 +134,8 @@ export default function DrugManagementPage() {
         onCategoryChange={handleCategoryChange}
         selectedStockStatus={selectedStockStatus}
         onStockStatusChange={handleStockStatusChange}
+        selectedStatus={selectedStatus}
+        onStatusChange={handleStatusChange}
         categories={formattedCategories}
       />
 
@@ -126,9 +143,9 @@ export default function DrugManagementPage() {
         drugs={drugs}
         isLoading={drugsLoading || categoriesLoading}
         currentPage={currentPage}
-        totalPages={1}
-        totalItems={drugs.length}
-        itemsPerPage={10}
+        totalPages={pagination.totalPages}
+        totalItems={pagination.totalItems}
+        itemsPerPage={pagination.itemsPerPage}
         onPageChange={(page) => setCurrentPage(page)}
         onEdit={handleEdit}
         onToggleStatus={handleToggleStatus}

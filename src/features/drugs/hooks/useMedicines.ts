@@ -1,27 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import type {
     Drug,
     CreateDrugRequest,
     UpdateDrugRequest,
-    DrugFilterParams
+    DrugFilterParams,
 } from '../types/Drug.types';
+import type { PaginationMeta } from '../../../types/api.types';
 import { medicineService } from '../../../services/medicineService';
+import { getErrorMessage } from '../../../utils/api-helpers';
 
-export interface PaginationMeta {
-    currentPage: number;
-    totalPages: number;
-    totalItems: number;
-    itemsPerPage: number;
-}
+const DEFAULT_LIMIT = 10;
 
 export const useMedicines = (initialParams?: DrugFilterParams) => {
-    const [items, setItems] = useState<Drug[]>([]);
-    const [pagination] = useState<PaginationMeta>({
-        currentPage: 1,
-        totalPages: 1,
-        totalItems: 0,
-        itemsPerPage: 10,
-    });
+    const [allItems, setAllItems] = useState<Drug[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [params, setParams] = useState<DrugFilterParams | undefined>(initialParams);
@@ -32,20 +23,41 @@ export const useMedicines = (initialParams?: DrugFilterParams) => {
         try {
             const queryParams = overrideParams ?? params;
             const data = await medicineService.getAll(queryParams);
-
-            if (Array.isArray(data)) {
-                setItems(data);
-            }
-        } catch (err: any) {
-            setError(err?.message || 'Failed to fetch medicines');
+            setAllItems(data ?? []);
+        } catch (err: unknown) {
+            setError(getErrorMessage(err, 'Failed to fetch medicines'));
         } finally {
             setLoading(false);
         }
     }, [params]);
 
     useEffect(() => {
+        // Data-fetching effect: loading state is set immediately on mount/filter change.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchAll(params);
-    }, [params]);
+    }, [params, fetchAll]);
+
+    const pagination = useMemo<PaginationMeta>(() => {
+        const currentPage = params?.page ?? 1;
+        const itemsPerPage = params?.limit ?? DEFAULT_LIMIT;
+        const totalItems = allItems.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+        return {
+            currentPage,
+            totalPages,
+            totalItems,
+            itemsPerPage,
+        };
+    }, [allItems.length, params]);
+
+    const items = useMemo<Drug[]>(() => {
+        const currentPage = params?.page ?? 1;
+        const itemsPerPage = params?.limit ?? DEFAULT_LIMIT;
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        return allItems.slice(start, end);
+    }, [allItems, params]);
 
     const createItem = async (payload: CreateDrugRequest) => {
         const newItem = await medicineService.create(payload);
@@ -60,9 +72,8 @@ export const useMedicines = (initialParams?: DrugFilterParams) => {
     };
 
     const toggleStatus = async (id: number | string, isActive: boolean) => {
-        const updated = await medicineService.toggleStatus(id, isActive);
+        await medicineService.toggleStatus(id, isActive);
         await fetchAll(params);
-        return updated;
     };
 
     const deleteItem = async (id: number | string) => {
@@ -76,6 +87,7 @@ export const useMedicines = (initialParams?: DrugFilterParams) => {
 
     return {
         items,
+        allItems,
         pagination,
         loading,
         error,

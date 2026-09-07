@@ -8,6 +8,8 @@ interface DrugFilterBarProps {
     onCategoryChange: (value: string) => void;
     selectedStockStatus: string;
     onStockStatusChange: (value: string) => void;
+    selectedStatus: string;
+    onStatusChange: (value: string) => void;
     categories: DrugCategory[];
 }
 
@@ -18,6 +20,8 @@ export function DrugFilterBar({
     onCategoryChange,
     selectedStockStatus,
     onStockStatusChange,
+    selectedStatus,
+    onStatusChange,
     categories
 }: DrugFilterBarProps) {
     return (
@@ -59,6 +63,19 @@ export function DrugFilterBar({
                         <option value="all">All Stock</option>
                         <option value="low">Low Stock</option>
                         <option value="out">Out of Stock</option>
+                    </select>
+                </div>
+
+                <div className="w-full md:w-48">
+                    <select
+                        value={selectedStatus}
+                        onChange={(e) => onStatusChange(e.target.value)}
+                        className="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-700 font-medium cursor-pointer"
+                    >
+                        <option value="">Status</option>
+                        <option value="all">All Status</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
                     </select>
                 </div>
             </div>

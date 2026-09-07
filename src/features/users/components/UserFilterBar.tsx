@@ -20,24 +20,24 @@ export const UserFilterBar: React.FC<UserFilterBarProps> = ({
     onStatusChange,
 }) => {
     return (
-        <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-4">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4">
             <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                 <div className="relative flex-1">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
 
                     <input
                         type="text"
                         placeholder="Search by name, username, or ID..."
                         value={search}
                         onChange={(e) => onSearchChange(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all placeholder:text-slate-400"
                     />
                 </div>
 
                 <select
                     value={selectedRole}
                     onChange={(e) => onRoleChange(e.target.value as UserRole | "")}
-                    className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 >
                     <option value="">All Roles</option>
                     <option value="admin">Admin</option>
@@ -49,7 +49,7 @@ export const UserFilterBar: React.FC<UserFilterBarProps> = ({
                 <select
                     value={selectedStatus}
                     onChange={(e) => onStatusChange(e.target.value as UserStatus | "")}
-                    className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 >
                     <option value="">All Status</option>
                     <option value="aktif">Active</option>

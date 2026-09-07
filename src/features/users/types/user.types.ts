@@ -1,5 +1,9 @@
 export type UserRole = 'admin' | 'kasir' | 'owner';
-export type UserStatus = 'aktif' | 'nonaktif';
+export type UserStatus = 'aktif' | 'nonaktif' | '1' | '0';
+
+export function isUserActive(status: UserStatus | number | string | unknown): boolean {
+    return status === 'aktif' || status === 1 || status === '1';
+}
 export type RoleFilter = 'all' | UserRole;
 
 export interface User {
@@ -8,7 +12,7 @@ export interface User {
     no_telp: string | null;
     role: UserRole;
     username: string;
-    status: UserStatus;
+    status: UserStatus | number;
     foto: string | null;
 }
 
@@ -18,16 +22,11 @@ export interface CreateUserRequest {
     role: UserRole;
     username: string;
     password: string;
-    status?: UserStatus;
+    status?: number;
     foto?: string | null;
 }
 
 export type UpdateUserRequest = Partial<CreateUserRequest>;
-export interface ApiResponse<T> {
-    message?: string;
-    data?: T;
-    error?: string;
-}
 
 export interface UserPagination {
     current_page: number;
@@ -41,10 +40,20 @@ export interface UserListResponse {
     pagination: UserPagination;
 }
 
+export interface LoginRequest {
+    username: string;
+    password: string;
+}
+
+export interface LoginResponse {
+    token: string;
+    user: User;
+}
+
 export interface UserFilterParams {
     page?: number;
     limit?: number;
     search?: string;
     role?: UserRole;
-    status?: UserStatus;
+    status?: string;
 }

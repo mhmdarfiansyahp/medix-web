@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { TypeDrug, CreateTypeDrugRequest, UpdateTypeDrugRequest } from '../types/Category.types';
 import { typeDrugService } from '../../../services/typeDrugService';
+import { getErrorMessage } from '../../../utils/api-helpers';
 
 export const useTypeDrugs = () => {
     const [items, setItems] = useState<TypeDrug[]>([]);
@@ -12,15 +13,17 @@ export const useTypeDrugs = () => {
         setError(null);
         try {
             const data = await typeDrugService.getAll();
-            setItems(data);
-        } catch (err: any) {
-            setError(err.message);
+            setItems(data ?? []);
+        } catch (err: unknown) {
+            setError(getErrorMessage(err, 'Failed to fetch drug categories'));
         } finally {
             setLoading(false);
         }
     }, []);
 
     useEffect(() => {
+        // Data-fetching effect: loading state is set immediately on mount.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchAll();
     }, [fetchAll]);
 

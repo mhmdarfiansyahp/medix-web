@@ -1,85 +1,99 @@
-import { fetchClient } from './api';
+import { apiClient } from './api';
 import type {
     Drug,
     CreateDrugRequest,
     UpdateDrugRequest,
     DrugFilterParams,
-    ApiResponse
+    LowStockDrug,
+    ExpiringDrug,
+    AlertSummary,
 } from '../features/drugs/types/Drug.types';
+import { encodePathParam, extractResponseData } from '../utils/api-helpers';
 
 const ENDPOINT = '/medicines';
 
 export const medicineService = {
     getAll: async (params?: DrugFilterParams): Promise<Drug[]> => {
-        const query = new URLSearchParams();
-
-        if (params) {
-            Object.entries(params).forEach(([key, value]) => {
-                if (value !== undefined && value !== null && value !== '') {
-                    query.append(key, String(value));
-                }
-            });
-        }
-
-        const queryString = query.toString();
-        const url = queryString ? `${ENDPOINT}?${queryString}` : ENDPOINT;
-
-        const res = await fetchClient<ApiResponse<Drug[]>>(url);
-        return res.data || [];
+        const res = await apiClient.get<{
+            status: string;
+            message: string;
+            data?: Drug[];
+        }>(ENDPOINT, { params: params as Record<string, unknown> });
+        return extractResponseData<Drug[]>(res, 'Medicines');
     },
 
     getById: async (id: number | string): Promise<Drug> => {
-        const res = await fetchClient<ApiResponse<Drug>>(`${ENDPOINT}/${id}`);
-        return res.data!;
+        const res = await apiClient.get<{
+            status: string;
+            message: string;
+            data?: Drug;
+        }>(`${ENDPOINT}/${encodePathParam(id)}`);
+        return extractResponseData<Drug>(res, 'Medicine');
     },
 
     getByBarcode: async (barcode: string): Promise<Drug> => {
-        const res = await fetchClient<ApiResponse<Drug>>(`${ENDPOINT}/barcode/${barcode}`);
-        return res.data!;
+        const res = await apiClient.get<{
+            status: string;
+            message: string;
+            data?: Drug;
+        }>(`${ENDPOINT}/barcode/${encodePathParam(barcode)}`);
+        return extractResponseData<Drug>(res, 'Medicine');
     },
 
     create: async (payload: CreateDrugRequest): Promise<Drug> => {
-        const res = await fetchClient<ApiResponse<Drug>>(ENDPOINT, {
-            method: 'POST',
-            body: JSON.stringify(payload),
-        });
-        return res.data!;
+        const res = await apiClient.post<{
+            status: string;
+            message: string;
+            data?: Drug;
+        }>(ENDPOINT, payload);
+        return extractResponseData<Drug>(res, 'Created medicine');
     },
 
     update: async (id: number | string, payload: UpdateDrugRequest): Promise<Drug> => {
-        const res = await fetchClient<ApiResponse<Drug>>(`${ENDPOINT}/${id}`, {
-            method: 'PUT',
-            body: JSON.stringify(payload),
-        });
-        return res.data!;
+        const res = await apiClient.put<{
+            status: string;
+            message: string;
+            data?: Drug;
+        }>(`${ENDPOINT}/${encodePathParam(id)}`, payload);
+        return extractResponseData<Drug>(res, 'Updated medicine');
     },
 
-    toggleStatus: async (id: number | string, isActive: boolean): Promise<Drug> => {
-        const res = await fetchClient<ApiResponse<Drug>>(`${ENDPOINT}/${id}/status`, {
-            method: 'PATCH',
-            body: JSON.stringify({ is_active: isActive })
-        });
-        return res.data!;
+    toggleStatus: async (id: number | string, isActive: boolean): Promise<void> => {
+        await apiClient.patch<{
+            status: string;
+            message: string;
+            data?: null;
+        }>(`${ENDPOINT}/${encodePathParam(id)}/status`, { is_active: isActive });
     },
+
     delete: async (id: number | string): Promise<void> => {
-        await fetchClient<ApiResponse<null>>(`${ENDPOINT}/${id}`, {
-            method: 'DELETE',
-        });
+        await apiClient.delete(`${ENDPOINT}/${encodePathParam(id)}`);
     },
 
-    // Alerts
-    getLowStock: async (): Promise<Drug[]> => {
-        const res = await fetchClient<ApiResponse<Drug[]>>(`${ENDPOINT}/alerts/low-stock`);
-        return res.data || [];
+    getLowStock: async (): Promise<LowStockDrug[]> => {
+        const res = await apiClient.get<{
+            status: string;
+            message: string;
+            data?: LowStockDrug[];
+        }>(`${ENDPOINT}/alerts/low-stock`);
+        return extractResponseData<LowStockDrug[]>(res, 'Low stock alerts');
     },
 
-    getExpiring: async (): Promise<Drug[]> => {
-        const res = await fetchClient<ApiResponse<Drug[]>>(`${ENDPOINT}/alerts/expiring`);
-        return res.data || [];
+    getExpiring: async (): Promise<ExpiringDrug[]> => {
+        const res = await apiClient.get<{
+            status: string;
+            message: string;
+            data?: ExpiringDrug[];
+        }>(`${ENDPOINT}/alerts/expiring`);
+        return extractResponseData<ExpiringDrug[]>(res, 'Expiring alerts');
     },
 
-    getAlertSummary: async (): Promise<{ low_stock_count: number; expiring_count: number }> => {
-        const res = await fetchClient<ApiResponse<{ low_stock_count: number; expiring_count: number }>>(`${ENDPOINT}/alerts/summary`);
-        return res.data!;
+    getAlertSummary: async (): Promise<AlertSummary> => {
+        const res = await apiClient.get<{
+            status: string;
+            message: string;
+            data?: AlertSummary;
+        }>(`${ENDPOINT}/alerts/summary`);
+        return extractResponseData<AlertSummary>(res, 'Alert summary');
     },
 };

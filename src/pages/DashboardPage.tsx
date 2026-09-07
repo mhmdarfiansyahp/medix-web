@@ -1,24 +1,23 @@
 // src/features/dashboard/pages/DashboardPage.tsx
 import { useState } from 'react';
 import {
-    AlertCircle,
     AlertTriangle,
     ArrowUpRight,
     Banknote,
-    Calendar,
-    CheckCircle2,
     Clock,
-    MoreVertical,
     ShoppingBag,
+    MoreVertical,
+    AlertCircle,
+    Calendar,
 } from 'lucide-react';
 import { cn, formatCurrency } from '../utils/utils';
+import { useAlerts } from '../features/drugs/hooks/useAlerts';
 
 // Import komponen-komponen Dashboard
 import { DashboardHeader } from '../features/dashboard/components/DashboardHeader';
 import { MedicationTable } from '../features/dashboard/components/MedicationTable';
 import { SalesChart } from '../features/dashboard/components/SalesChart';
 import type {
-    InventoryAlert,
     MedicationPerformance,
     SalesTrend,
 } from '../features/dashboard/types';
@@ -50,15 +49,28 @@ const DUMMY_BOTTOM_MEDICATIONS: MedicationPerformance[] = [
     { id: '14', name: 'Vitamin C 500mg', sku: 'VTC-500-T5', category: 'Vitamin', unitsSold: 15, revenue: 300000, status: 'IN STOCK' },
 ];
 
-const DUMMY_INVENTORY_ALERTS: InventoryAlert[] = [
-    { id: '1', name: 'Amoxicillin 250mg', detail: '12 units remaining', type: 'LOW_STOCK', label: 'LOW STOCK' },
-    { id: '2', name: 'Lisinopril 10mg', detail: 'Batch A49B - Expiring in 15 days', type: 'EXPIRING', label: 'EXPIRING' },
-    { id: '3', name: 'Atorvastatin 20mg', detail: 'Completely out of stock', type: 'EMPTY', label: 'EMPTY' },
-    { id: '4', name: 'Metformin 500mg', detail: '500 units successfully restocked', type: 'RESTOCKED', label: 'RESTOCKED' },
-];
+
 
 export default function DashboardPage() {
     const [currentUserRole] = useState<'ADMIN' | 'OWNER'>('ADMIN');
+    const { lowStock, expiring, summary } = useAlerts();
+
+    const dashboardAlerts = [
+        ...lowStock.slice(0, 2).map(item => ({
+            id: String(item.id_obat),
+            name: item.nama_obat,
+            detail: `${item.stok} units remaining`,
+            type: 'LOW_STOCK' as const,
+            label: 'LOW STOCK',
+        })),
+        ...expiring.slice(0, 2).map(item => ({
+            id: String(item.id_obat),
+            name: item.nama_obat,
+            detail: `Expiring in ${item.sisa_hari} days`,
+            type: 'EXPIRING' as const,
+            label: 'EXPIRING',
+        })),
+    ];
 
     return (
         <div className="space-y-6 pb-10">
@@ -104,13 +116,13 @@ export default function DashboardPage() {
                         <span className="text-xs font-semibold uppercase tracking-wider text-rose-700">
                             Critical Low Stock
                         </span>
-                        <div className="text-2xl font-bold text-rose-700">12 Items</div>
-                        <button
-                            type="button"
+                        <div className="text-2xl font-bold text-rose-700">{summary?.total_low_stock ?? 0} Items</div>
+                        <a
+                            href="/stock-alerts/low-stock"
                             className="text-xs font-semibold text-rose-700 hover:underline flex items-center gap-1 pt-1"
                         >
                             View Low Stock &rarr;
-                        </button>
+                        </a>
                     </div>
                     <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center">
                         <AlertTriangle className="w-6 h-6" />
@@ -136,29 +148,25 @@ export default function DashboardPage() {
                         </div>
 
                         <div className="space-y-3">
-                            {DUMMY_INVENTORY_ALERTS.map((alert) => (
+                            {dashboardAlerts.map((alert) => (
                                 <div
                                     key={alert.id}
                                     className={cn(
                                         'p-3.5 rounded-xl border flex items-center justify-between gap-3',
-                                        (alert.type === 'LOW_STOCK' || alert.type === 'EMPTY') && 'bg-rose-50/40 border-rose-100',
-                                        alert.type === 'EXPIRING' && 'bg-amber-50/40 border-amber-100',
-                                        alert.type === 'RESTOCKED' && 'bg-emerald-50/40 border-emerald-100'
+                                        alert.type === 'LOW_STOCK' && 'bg-rose-50/40 border-rose-100',
+                                        alert.type === 'EXPIRING' && 'bg-amber-50/40 border-amber-100'
                                     )}
                                 >
                                     <div className="flex items-center gap-3 min-w-0">
                                         <div
                                             className={cn(
                                                 'p-2 rounded-lg shrink-0',
-                                                (alert.type === 'LOW_STOCK' || alert.type === 'EMPTY') && 'bg-rose-100 text-rose-600',
-                                                alert.type === 'EXPIRING' && 'bg-amber-100 text-amber-600',
-                                                alert.type === 'RESTOCKED' && 'bg-emerald-100 text-emerald-600'
+                                                alert.type === 'LOW_STOCK' && 'bg-rose-100 text-rose-600',
+                                                alert.type === 'EXPIRING' && 'bg-amber-100 text-amber-600'
                                             )}
                                         >
                                             {alert.type === 'EXPIRING' ? (
                                                 <Calendar className="w-4 h-4" />
-                                            ) : alert.type === 'RESTOCKED' ? (
-                                                <CheckCircle2 className="w-4 h-4" />
                                             ) : (
                                                 <AlertCircle className="w-4 h-4" />
                                             )}
@@ -172,9 +180,8 @@ export default function DashboardPage() {
                                     <span
                                         className={cn(
                                             'text-[10px] font-bold px-2 py-0.5 rounded uppercase shrink-0',
-                                            (alert.type === 'LOW_STOCK' || alert.type === 'EMPTY') && 'bg-rose-100 text-rose-700',
-                                            alert.type === 'EXPIRING' && 'bg-amber-100 text-amber-700',
-                                            alert.type === 'RESTOCKED' && 'bg-emerald-100 text-emerald-700'
+                                            alert.type === 'LOW_STOCK' && 'bg-rose-100 text-rose-700',
+                                            alert.type === 'EXPIRING' && 'bg-amber-100 text-amber-700'
                                         )}
                                     >
                                         {alert.label}
@@ -184,12 +191,12 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    <button
-                        type="button"
-                        className="w-full mt-4 py-2.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
-                    >
-                        View All Alerts (12 Items)
-                    </button>
+                    <a
+                            href="/stock-alerts/low-stock"
+                            className="w-full mt-4 py-2.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors inline-block text-center"
+                        >
+                            View All Alerts ({lowStock.length + expiring.length} Items)
+                        </a>
                 </div>
             </div>
 

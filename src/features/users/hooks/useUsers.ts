@@ -1,30 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
-
 import type {
     User,
     CreateUserRequest,
     UpdateUserRequest,
     UserFilterParams,
 } from '../types/user.types';
-
+import type { PaginationMeta } from '../../../types/api.types';
 import { userService } from '../../../services/userService';
-
-export interface PaginationMeta {
-    currentPage: number;
-    totalPages: number;
-    totalItems: number;
-    itemsPerPage: number;
-}
+import { getErrorMessage } from '../../../utils/api-helpers';
 
 export const useUsers = (initialParams?: UserFilterParams) => {
     const [items, setItems] = useState<User[]>([]);
-    const [pagination, setPagination] =
-        useState<PaginationMeta>({
-            currentPage: 1,
-            totalPages: 1,
-            totalItems: 0,
-            itemsPerPage: 10,
-        });
+    const [pagination, setPagination] = useState<PaginationMeta>({
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: 0,
+        itemsPerPage: 10,
+    });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -39,22 +31,10 @@ export const useUsers = (initialParams?: UserFilterParams) => {
                 const queryParams = overrideParams ?? params;
                 const response = await userService.getAll(queryParams);
 
-                setItems(response.data);
-                setPagination({
-                    currentPage:
-                        response.pagination.current_page,
-                    totalPages:
-                        response.pagination.total_pages,
-                    totalItems:
-                        response.pagination.total_items,
-                    itemsPerPage:
-                        response.pagination.items_per_page,
-                });
-            } catch (err: any) {
-                setError(
-                    err?.message ||
-                    "Failed to fetch users"
-                );
+                setItems(response.data ?? []);
+                setPagination(response.pagination);
+            } catch (err: unknown) {
+                setError(getErrorMessage(err, 'Failed to fetch users'));
             } finally {
                 setLoading(false);
             }
@@ -62,24 +42,20 @@ export const useUsers = (initialParams?: UserFilterParams) => {
         [params]
     );
 
-
     useEffect(() => {
+        // Data-fetching effect: loading state is set immediately on mount/filter change.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchAll(params);
-    }, [params]);
+    }, [params, fetchAll]);
 
     const createUser = async (payload: CreateUserRequest) => {
         const newUser = await userService.create(payload);
         await fetchAll(params);
-
         return newUser;
     };
 
-    const updateUser = async (
-        id: number | string,
-        payload: UpdateUserRequest
-    ) => {
+    const updateUser = async (id: number | string, payload: UpdateUserRequest) => {
         const updatedUser = await userService.update(id, payload);
-
         await fetchAll(params);
         return updatedUser;
     };
@@ -100,5 +76,5 @@ export const useUsers = (initialParams?: UserFilterParams) => {
         createUser,
         updateUser,
         deleteUser,
-    }
-}
+    };
+};

@@ -34,12 +34,19 @@ export default function UsersPage() {
     });
 
     useEffect(() => {
+        const statusParam =
+            selectedStatus === "aktif"
+                ? "1"
+                : selectedStatus === "nonaktif"
+                    ? "0"
+                    : undefined;
+
         setParams({
             page: currentPage,
             limit: 10,
             search: search.trim() || undefined,
             role: selectedRole || undefined,
-            status: selectedStatus || undefined,
+            status: statusParam,
         });
     }, [
         search,
@@ -77,9 +84,9 @@ export default function UsersPage() {
             showSuccessToast(
                 `User "${user.nama_user}" berhasil dihapus.`
             );
-        } catch (error: any) {
+        } catch (error: unknown) {
             showErrorToast(
-                error?.message || "Gagal menghapus user."
+                error instanceof Error ? error.message : "Gagal menghapus user."
             );
         }
     };
