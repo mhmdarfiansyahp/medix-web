@@ -30,8 +30,4 @@ export const reportService = {
     exportExcel: async (params?: ReportFilterParams): Promise<Blob> => {
         return apiClient.getBlob(`${ENDPOINT}/export/excel`, { params: params as Record<string, unknown> });
     },
-
-    exportPDF: async (params?: ReportFilterParams): Promise<Blob> => {
-        return apiClient.getBlob(`${ENDPOINT}/export/pdf`, { params: params as Record<string, unknown> });
-    },
 };

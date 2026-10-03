@@ -1,8 +1,37 @@
+export interface Drug {
+    id_obat: number;
+    nama_obat: string;
+    merk_obat: string | null;
+    jenis_obat_id: number | null;
+    jenis_obat?: DrugCategory | null;
+    barcode: string | null;
+    tgl_kadaluarsa: string;
+    harga: number;
+    stok: number;
+    stok_minimum: number;
+    keterangan: string | null;
+    status: number;
+    gambar: string | null;
+    created_at?: string;
+}
+
+export interface DrugCategory {
+    id_jenis: number;
+    nama_jenis: string;
+}
+
 export interface TransactionDetail {
     id_detail: number;
     id_obat: number;
     jumlah: number;
     harga_satuan: number;
+    subtotal: number;
+}
+
+export interface CartItem {
+    id: string;
+    drug: Drug;
+    quantity: number;
     subtotal: number;
 }
 

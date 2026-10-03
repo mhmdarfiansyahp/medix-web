@@ -12,59 +12,24 @@ import {
 } from 'lucide-react';
 import { cn, formatCurrency } from '../utils/utils';
 import { useAlerts } from '../features/drugs/hooks/useAlerts';
-import { reportService } from '../services/reportService';
+import { useReports } from '../features/reports/hooks/useReports';
 
 // Import komponen-komponen Dashboard
 import { DashboardHeader } from '../features/dashboard/components/DashboardHeader';
 import { MedicationTable } from '../features/dashboard/components/MedicationTable';
 import { SalesChart } from '../features/dashboard/components/SalesChart';
-import type { SalesChartData, DrugSalesStat } from '../features/reports/types/report.types';
-
-// DUMMY DATA IN ENGLISH
-const DUMMY_SALES_TRENDS: SalesChartData[] = [
-    { periode: 'Day 01', total_penjualan: 3200000, jumlah_transaksi: 120 },
-    { periode: 'Day 05', total_penjualan: 4500000, jumlah_transaksi: 180 },
-    { periode: 'Day 10', total_penjualan: 3800000, jumlah_transaksi: 140 },
-    { periode: 'Day 15', total_penjualan: 5100000, jumlah_transaksi: 210 },
-    { periode: 'Day 20', total_penjualan: 4200000, jumlah_transaksi: 160 },
-    { periode: 'Day 25', total_penjualan: 6000000, jumlah_transaksi: 250 },
-    { periode: 'Day 30', total_penjualan: 5800000, jumlah_transaksi: 230 },
-];
-
-const DUMMY_TOP_MEDICATIONS: DrugSalesStat[] = [
-    { id_obat: 1, nama_obat: 'Paracetamol 500mg', total_terjual: 1240, total_omset: 15500000 },
-    { id_obat: 2, nama_obat: 'Amoxicillin 250mg', total_terjual: 856, total_omset: 21400000 },
-    { id_obat: 3, nama_obat: 'Ibuprofen 400mg', total_terjual: 742, total_omset: 11130000 },
-    { id_obat: 4, nama_obat: 'Omeprazole 20mg', total_terjual: 610, total_omset: 18300000 },
-    { id_obat: 5, nama_obat: 'Azithromycin 250mg', total_terjual: 430, total_omset: 17200000 },
-];
-
-const DUMMY_BOTTOM_MEDICATIONS: DrugSalesStat[] = [
-    { id_obat: 10, nama_obat: 'Multivitamin Syrup 60ml', total_terjual: 2, total_omset: 90000 },
-    { id_obat: 11, nama_obat: 'Antacid Liquid 100ml', total_terjual: 5, total_omset: 175000 },
-    { id_obat: 12, nama_obat: 'Cetirizine 10mg', total_terjual: 8, total_omset: 240000 },
-    { id_obat: 13, nama_obat: 'Cough Syrup 100ml', total_terjual: 12, total_omset: 480000 },
-    { id_obat: 14, nama_obat: 'Vitamin C 500mg', total_terjual: 15, total_omset: 300000 },
-];
 
 
 
 export default function DashboardPage() {
     const [currentUserRole] = useState<'ADMIN' | 'OWNER'>('ADMIN');
     const { lowStock, expiring, summary } = useAlerts();
-    const [salesChartData, setSalesChartData] = useState<SalesChartData[]>(DUMMY_SALES_TRENDS);
+    const { salesSummary, drugRanking, fetchSalesSummary, fetchDrugRanking } = useReports();
 
     useEffect(() => {
-        const fetchSales = async () => {
-            try {
-                const res = await reportService.getSalesSummary({ group_by: 'monthly' });
-                setSalesChartData(res.chart_data ?? DUMMY_SALES_TRENDS);
-            } catch {
-                setSalesChartData(DUMMY_SALES_TRENDS);
-            }
-        };
-        fetchSales();
-    }, []);
+        fetchSalesSummary({ group_by: 'monthly' });
+        fetchDrugRanking();
+    }, [fetchSalesSummary, fetchDrugRanking]);
 
     const dashboardAlerts = [
         ...lowStock.slice(0, 2).map(item => ({
@@ -95,7 +60,7 @@ export default function DashboardPage() {
                         <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                             Total Revenue (Today)
                         </span>
-                        <div className="text-2xl font-bold text-slate-900">{formatCurrency(4250000)}</div>
+                        <div className="text-2xl font-bold text-slate-900">{formatCurrency(salesSummary?.total_penjualan ?? 0)}</div>
                         <div className="flex items-center text-xs font-medium text-emerald-600 gap-1 pt-1">
                             <ArrowUpRight className="w-3.5 h-3.5" />
                             <span>+12% vs yesterday</span>
@@ -143,7 +108,7 @@ export default function DashboardPage() {
 
             {/* 3. Chart & Inventory Sidebar Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <SalesChart data={salesChartData} />
+                <SalesChart data={salesSummary?.chart_data ?? []} />
 
                 {/* Inventory Alerts Sidebar */}
                 <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
@@ -212,7 +177,11 @@ export default function DashboardPage() {
             </div>
 
             {/* 4. TanStack Medication Performance Table */}
-            <MedicationTable topData={DUMMY_TOP_MEDICATIONS} bottomData={DUMMY_BOTTOM_MEDICATIONS} />
+            <MedicationTable 
+                topData={drugRanking?.top_medicines ?? []} 
+                bottomData={drugRanking?.bottom_medicines ?? []} 
+                filterParams={{ group_by: 'monthly' }}
+            />
         </div>
     );
 }

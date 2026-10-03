@@ -145,7 +145,7 @@ export default function SettingsPage() {
                                 onClick={() =>
                                     (document.querySelector('input[type="file"]') as HTMLInputElement)?.click()
                                 }
-                                className="px-3.5 py-2 text-sm text-rose-600 hover:text-rose-700 rounded-lg transition-colors text-sm font-medium"
+                                className="px-3.5 py-2 text-sm text-rose-600 hover:text-rose-700 rounded-lg transition-colors font-medium"
                             >
                                 Ganti Foto
                             </button>

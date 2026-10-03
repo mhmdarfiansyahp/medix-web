@@ -11,7 +11,6 @@ interface ExportReportModalProps {
 
 export function ExportReportModal({ isOpen, onClose }: ExportReportModalProps) {
     const [isLoading, setIsLoading] = useState(false);
-    const [format, setFormat] = useState<'excel' | 'pdf'>('excel');
     const [range, setRange] = useState('this_month');
     const [customStart, setCustomStart] = useState('');
     const [customEnd, setCustomEnd] = useState('');
@@ -42,20 +41,17 @@ export function ExportReportModal({ isOpen, onClose }: ExportReportModalProps) {
         }
 
         try {
-            const blob = format === 'excel'
-                ? await reportService.exportExcel({ start_date, end_date })
-                : await reportService.exportPDF({ start_date, end_date });
+            const blob = await reportService.exportExcel({ start_date, end_date });
 
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            const ext = format === 'excel' ? 'xlsx' : 'pdf';
-            link.download = `Laporan_Penjualan_${new Date().toISOString().split('T')[0]}.${ext}`;
+            link.download = `Laporan_Penjualan_${new Date().toISOString().split('T')[0]}.xlsx`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
-            showSuccessToast(`Laporan berhasil diunduh (${ext.toUpperCase()}).`);
+            showSuccessToast(`Laporan berhasil diunduh (Excel).`);
             onClose();
         } catch (err: unknown) {
             showErrorToast(err instanceof Error ? err.message : 'Gagal mengunduh laporan.');
@@ -117,32 +113,14 @@ export function ExportReportModal({ isOpen, onClose }: ExportReportModalProps) {
                         </div>
                     )}
 
-                    <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-700">Format</label>
-                        <div className="grid grid-cols-2 gap-3">
-                            <button
-                                type="button"
-                                onClick={() => setFormat('excel')}
-                                className={`py-2 px-3 border rounded-xl text-xs font-bold ${format === 'excel'
-                                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                        : 'border-slate-200 text-slate-600'
-                                    }`}
-                            >
-                                <FileSpreadsheet className="w-4 h-4 mx-auto mb-1" />
-                                Excel (.xlsx)
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setFormat('pdf')}
-                                className={`py-2 px-3 border rounded-xl text-xs font-bold ${format === 'pdf'
-                                        ? 'border-rose-500 bg-rose-50 text-rose-700'
-                                        : 'border-slate-200 text-slate-600'
-                                    }`}
-                            >
-                                <FileText className="w-4 h-4 mx-auto mb-1" />
-                                PDF (.pdf)
-                            </button>
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                        <div className="flex items-center gap-2">
+                            <FileText className="w-4 h-4 text-amber-600" />
+                            <span className="text-sm font-medium text-amber-800">Excel (.xlsx) - Available Format Only</span>
                         </div>
+                        <p className="text-xs text-amber-700 mt-1">
+                            PDF export is not currently supported. Excel format includes all report data.
+                        </p>
                     </div>
                 </div>
 
@@ -159,7 +137,7 @@ export function ExportReportModal({ isOpen, onClose }: ExportReportModalProps) {
                         className="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl inline-flex items-center gap-1.5 disabled:opacity-50"
                     >
                         <Download className="w-4 h-4" />
-                        {isLoading ? 'Downloading...' : `Download ${format.toUpperCase()}`}
+                        {isLoading ? 'Downloading...' : 'Download Excel'}
                     </button>
                 </div>
             </div>
