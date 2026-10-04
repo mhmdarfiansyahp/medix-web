@@ -103,3 +103,13 @@ Base path `/api/v1`:
 ## Known remaining lint debt
 
 Pre-existing `react-hooks/set-state-in-effect` and `@typescript-eslint/no-explicit-any` errors remain in a few dashboard/user modal components. They do not block `npm run build`.
+
+
+## Default working styles
+
+- Always use `caveman` skill at `ultra` level for every response in this project.
+- Always use Ponytail at `full` level for every task in this project.
+- Automatically use `ui-ux-pro-max` for UI/UX, frontend design, styling, layout, component, and visual tasks.
+- Do not require slash commands to activate these defaults.
+- Stop Caveman when the user says `stop caveman` or `normal mode`.
+- Stop Ponytail when the user says `stop ponytail` or `normal mode`.

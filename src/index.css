@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+@media print {
+  /* Sembunyikan semua elemen di halaman secara umum */
+  body * {
+    visibility: hidden;
+  }
+  
+  /* Tampilkan hanya area struk dan anak-anak elemennya */
+  #printable-receipt, #printable-receipt * {
+    visibility: visible;
+  }
+
+  /* Atur posisi struk agar berada di pojok kiri atas kertas */
+  #printable-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+}

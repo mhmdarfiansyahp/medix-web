@@ -1,6 +1,7 @@
-import { ShoppingCart, Plus, Trash2, Save, X, Minus } from 'lucide-react';
+import { ShoppingCart, Plus, Trash2, X, Minus } from 'lucide-react';
 import type { CartItem } from '../types/transaction.types';
 import { formatCurrency } from '../../../utils/utils';
+import TransactionSubmitButton from './TransactionSubmitButton';
 
 interface CartModalProps {
     isOpen: boolean;
@@ -107,20 +108,13 @@ export default function CartModal({ isOpen, onClose, cartItems, onUpdateQuantity
                         <span className="text-blue-600">{formatCurrency(calculateTotal())}</span>
                     </div>
 
-                    <button
-                        onClick={onCreateTransaction}
+                    <TransactionSubmitButton
+                        onSubmit={onCreateTransaction}
                         disabled={isCreating || cartItems.length === 0}
-                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {isCreating ? (
-                            <>Memproses...</>
-                        ) : (
-                            <>
-                                <Save className="w-4 h-4" />
-                                Buat Transaksi
-                            </>
-                        )}
-                    </button>
+                        isLoading={isCreating}
+                        totalAmount={calculateTotal()}
+                        className="disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
 
                     <button
                         onClick={onClose}
