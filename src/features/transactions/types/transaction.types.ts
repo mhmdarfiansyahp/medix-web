@@ -23,6 +23,7 @@ export interface DrugCategory {
 export interface TransactionDetail {
     id_detail: number;
     id_obat: number;
+    nama_obat?: string | null;
     jumlah: number;
     harga_satuan: number;
     subtotal: number;

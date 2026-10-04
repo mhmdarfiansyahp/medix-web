@@ -1,23 +1,28 @@
 @import "tailwindcss";
 
 @media print {
-  /* Sembunyikan semua elemen di halaman secara umum */
-  body * {
-    visibility: hidden;
-  }
-  
-  /* Tampilkan hanya area struk dan anak-anak elemennya */
-  #printable-receipt, #printable-receipt * {
-    visibility: visible;
+  @page {
+    margin: 10mm;
   }
 
-  /* Atur posisi struk agar berada di pojok kiri atas kertas */
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  #printable-receipt,
+  #printable-receipt * {
+    color: #0f172a !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
   #printable-receipt {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 0;
+    background: #fff !important;
+    width: 80mm !important;
+    max-width: 80mm !important;
+    margin: 0 auto !important;
+    padding: 6mm 5mm !important;
+    box-sizing: border-box;
   }
 }

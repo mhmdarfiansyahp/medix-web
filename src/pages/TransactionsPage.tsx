@@ -91,8 +91,16 @@ export default function TransactionsPage() {
     setShowReceiptModal(true);
     setLoadingReceipt(true);
     try {
+      if (drugs.length === 0) await fetchDrugs();
       const detail = await transactionService.getById(id_transaksi);
-      setReceiptData(detail);
+      const names = new Map(drugs.map((d) => [d.id_obat, d.nama_obat]));
+      setReceiptData({
+        ...detail,
+        details: (detail.details ?? []).map((d) => ({
+          ...d,
+          nama_obat: d.nama_obat || names.get(d.id_obat) || `Obat #${d.id_obat}`,
+        })),
+      });
     } catch (err) {
       showErrorToast("Gagal mengambil detail transaksi");
     } finally {
