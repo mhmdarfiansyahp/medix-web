@@ -1,16 +1,25 @@
 import { ApiError } from '../types/api.types';
-import { buildUrl } from '../utils/api-helpers';
+import { buildUrl, extractResponseData } from '../utils/api-helpers';
+import { isTokenExpired } from '../utils/jwt-utils';
+import type { LoginResponse } from '../features/users/types/user.types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 const LOGIN_PATH = '/login';
 
 export const tokenStorage = {
     getToken: (): string | null => localStorage.getItem('medix_token'),
+    getTokenExpiry: (): number | null => {
+        const exp = localStorage.getItem('medix_token_exp');
+        return exp ? parseInt(exp) : null;
+    },
     setToken: (token: string): void => {
         localStorage.setItem('medix_token', token);
+        const expiry = Date.now() + 8 * 60 * 60 * 1000;
+        localStorage.setItem('medix_token_exp', expiry.toString());
     },
     clear: (): void => {
         localStorage.removeItem('medix_token');
+        localStorage.removeItem('medix_token_exp');
     },
 };
 
@@ -72,6 +81,14 @@ class ApiClient {
 
         const token = tokenStorage.getToken();
         if (token) {
+            if (isTokenExpired(token)) {
+                tokenStorage.clear();
+                userStorage.clear();
+                if (window.location.pathname !== LOGIN_PATH) {
+                    window.location.href = LOGIN_PATH;
+                }
+                return headers;
+            }
             headers.Authorization = `Bearer ${token}`;
         }
 
@@ -122,7 +139,7 @@ class ApiClient {
         }
 
         if (response.status === 401) {
-            this.handleAuthFailure();
+            await this.handleAuthFailure();
         }
 
         throw new ApiError(
@@ -133,7 +150,19 @@ class ApiClient {
         );
     }
 
-    private handleAuthFailure(): void {
+    private async handleAuthFailure(): Promise<void> {
+        const token = tokenStorage.getToken();
+        if (token && !isTokenExpired(token)) {
+            try {
+                const res = await apiClient.post('/users/refresh');
+                const data = extractResponseData<LoginResponse>(res, 'Token refresh response');
+                tokenStorage.setToken(data.token);
+                userStorage.setUser(data.user);
+                return;
+            } catch {
+                // Refresh failed, proceed to logout
+            }
+        }
         tokenStorage.clear();
         userStorage.clear();
         if (window.location.pathname !== LOGIN_PATH) {

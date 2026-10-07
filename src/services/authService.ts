@@ -18,6 +18,19 @@ export const authService = {
         return data;
     },
 
+    refresh: async (): Promise<LoginResponse> => {
+        const res = await apiClient.post<{
+            status: string;
+            message: string;
+            data?: LoginResponse;
+        }>(`${ENDPOINT}/refresh`);
+
+        const data = extractResponseData<LoginResponse>(res, 'Token refresh response');
+        tokenStorage.setToken(data.token);
+        userStorage.setUser(data.user);
+        return data;
+    },
+
     logout: (): void => {
         tokenStorage.clear();
         userStorage.clear();

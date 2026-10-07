@@ -16,7 +16,7 @@ export default function LoginPage() {
         setError(null);
 
         if (!username.trim() || !password.trim()) {
-            setError('Username dan password wajib diisi');
+            setError('Username and password are required');
             return;
         }
 
@@ -25,7 +25,7 @@ export default function LoginPage() {
             await authService.login({ username: username.trim(), password });
             navigate('/dashboard', { replace: true });
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Login gagal. Silakan coba lagi.');
+            setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -33,7 +33,7 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12">
-            <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
+            <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-10">
                 <div className="flex flex-col items-center mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-blue-600 text-white flex items-center justify-center mb-4 shadow-lg shadow-blue-500/25">
                         <Pill className="w-8 h-8" />
@@ -52,9 +52,9 @@ export default function LoginPage() {
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            placeholder="Masukkan username"
+                            placeholder="Enter your username"
                             autoComplete="username"
-                            className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all placeholder:text-slate-400"
+                            className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all placeholder:text-slate-400"
                         />
                     </div>
 
@@ -68,17 +68,17 @@ export default function LoginPage() {
                                 type={showPassword ? 'text' : 'password'}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Masukkan password"
+                                placeholder="Enter your password"
                                 autoComplete="current-password"
-                                className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all placeholder:text-slate-400 pr-10"
+                                className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all placeholder:text-slate-400 pr-12"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword((prev) => !prev)}
                                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                                aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                                aria-label={showPassword ? 'Hide password' : 'Show password'}
                             >
-                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                             </button>
                         </div>
                     </div>
@@ -92,12 +92,12 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-sm shadow-blue-500/20"
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 text-base font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-sm shadow-blue-500/20"
                     >
                         {loading ? (
                             <>
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                Memuat...
+                                Loading...
                             </>
                         ) : (
                             'Sign In'
