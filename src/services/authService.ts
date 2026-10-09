@@ -14,19 +14,25 @@ export const authService = {
 
         const data = extractResponseData<LoginResponse>(res, 'Login response');
         tokenStorage.setToken(data.token);
+        tokenStorage.setRefreshToken(data.refresh_token as string);
         userStorage.setUser(data.user);
         return data;
     },
 
     refresh: async (): Promise<LoginResponse> => {
+        const refreshToken = tokenStorage.getRefreshToken();
+        if (!refreshToken) {
+            throw new Error('No refresh token available');
+        }
         const res = await apiClient.post<{
             status: string;
             message: string;
             data?: LoginResponse;
-        }>(`${ENDPOINT}/refresh`);
+        }>(`${ENDPOINT}/refresh`, { refresh_token: refreshToken });
 
         const data = extractResponseData<LoginResponse>(res, 'Token refresh response');
         tokenStorage.setToken(data.token);
+        tokenStorage.setRefreshToken(data.refresh_token as string);
         userStorage.setUser(data.user);
         return data;
     },

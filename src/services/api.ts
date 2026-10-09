@@ -8,6 +8,7 @@ const LOGIN_PATH = '/login';
 
 export const tokenStorage = {
     getToken: (): string | null => localStorage.getItem('medix_token'),
+    getRefreshToken: (): string | null => localStorage.getItem('medix_refresh_token'),
     getTokenExpiry: (): number | null => {
         const exp = localStorage.getItem('medix_token_exp');
         return exp ? parseInt(exp) : null;
@@ -17,9 +18,13 @@ export const tokenStorage = {
         const expiry = Date.now() + 8 * 60 * 60 * 1000;
         localStorage.setItem('medix_token_exp', expiry.toString());
     },
+    setRefreshToken: (token: string): void => {
+        localStorage.setItem('medix_refresh_token', token);
+    },
     clear: (): void => {
         localStorage.removeItem('medix_token');
         localStorage.removeItem('medix_token_exp');
+        localStorage.removeItem('medix_refresh_token');
     },
 };
 
@@ -154,9 +159,11 @@ class ApiClient {
         const token = tokenStorage.getToken();
         if (token && !isTokenExpired(token)) {
             try {
-                const res = await apiClient.post('/users/refresh');
+                const refreshToken = tokenStorage.getRefreshToken();
+                const res = await apiClient.post<{ refresh_token: string }>(`/users/refresh`, { refresh_token: refreshToken });
                 const data = extractResponseData<LoginResponse>(res, 'Token refresh response');
                 tokenStorage.setToken(data.token);
+                tokenStorage.setRefreshToken(data.refresh_token as string);
                 userStorage.setUser(data.user);
                 return;
             } catch {

@@ -18,8 +18,8 @@ export const useAlerts = (): UseAlertsReturn => {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchAll = useCallback(async () => {
-        setLoading(true);
+    const fetchAll = useCallback(async (silent = false) => {
+        if (!silent) setLoading(true);
         setError(null);
 
         const [lowRes, expiringRes, summaryRes] = await Promise.allSettled([
@@ -39,13 +39,18 @@ export const useAlerts = (): UseAlertsReturn => {
             console.warn('Some alert endpoints failed:', failures);
         }
 
-        setLoading(false);
+        if (!silent) setLoading(false);
     }, []);
 
     useEffect(() => {
         // Data-fetching effect: loading state is set immediately on mount.
         // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchAll();
+        // ponytail: 30s polling, SSE/WebSocket if latency matters
+        const id = setInterval(() => {
+            if (!document.hidden) void fetchAll(true);
+        }, 10_000);
+        return () => clearInterval(id);
     }, [fetchAll]);
 
     return {
