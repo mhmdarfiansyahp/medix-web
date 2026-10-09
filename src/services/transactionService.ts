@@ -2,7 +2,6 @@ import { apiClient } from './api';
 import type {
     Transaction,
     CreateTransactionRequest,
-    CancelTransactionResponse,
     TodayTransactionResponse,
     ReceiptData,
 } from '../features/transactions/types/transaction.types';
@@ -47,13 +46,8 @@ export const transactionService = {
         return extractResponseData<Transaction>(res, 'Created transaction');
     },
 
-    cancel: async (id: number | string): Promise<CancelTransactionResponse> => {
-        const res = await apiClient.patch<{
-            status: string;
-            message: string;
-            data?: CancelTransactionResponse;
-        }>(`${ENDPOINT}/${encodePathParam(id)}/cancel`, {});
-        return extractResponseData<CancelTransactionResponse>(res, 'Cancelled transaction');
+    cancel: async (id: number | string): Promise<void> => {
+        await apiClient.patch(`${ENDPOINT}/${encodePathParam(id)}/cancel`, {});
     },
 
     getReceipt: async (id: number | string): Promise<ReceiptData> => {

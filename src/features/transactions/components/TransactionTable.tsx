@@ -1,5 +1,5 @@
 import { FileText, Trash2, Coins, TrendingUp, Calendar } from 'lucide-react';
-import { formatCurrency } from '../../../utils/utils';
+import { formatCurrency, cn } from '../../../utils/utils';
 
 interface Transaction {
     id_transaksi: number;
@@ -79,10 +79,17 @@ export default function TransactionTable({ transactions, onViewReceipt, onCancel
                                     </div>
                                 </td>
                                 <td className="py-4 px-6 text-center">
-                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 shadow-sm">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                                        Active
-                                    </span>
+                                    {tx.status === 0 ? (
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500 shadow-sm">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
+                                            Dibatalkan
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 shadow-sm">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                            Selesai
+                                        </span>
+                                    )}
                                 </td>
                                 <td className="py-4 px-6 text-center">
                                     <div className="flex items-center justify-center gap-1.5">
@@ -95,8 +102,12 @@ export default function TransactionTable({ transactions, onViewReceipt, onCancel
                                         </button>
                                         <button
                                             onClick={() => onCancelTransaction(tx.id_transaksi)}
-                                            className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all duration-200 shadow-sm hover:shadow"
-                                            title="Cancel Transaction"
+                                            disabled={tx.status === 0}
+                                            className={cn(
+                                                "p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all duration-200 shadow-sm hover:shadow",
+                                                tx.status === 0 && "opacity-50 cursor-not-allowed"
+                                            )}
+                                            title={tx.status === 0 ? "Transaksi sudah dibatalkan" : "Cancel Transaction"}
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>

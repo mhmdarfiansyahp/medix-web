@@ -56,7 +56,12 @@ export default function TransactionsPage() {
   const fetchDrugs = async () => {
     try {
       const drugsData = await medicineService.getAll({ search: searchTerm, status: '1' });
-      setDrugs(drugsData);
+      // Filter out expired medicines
+      const validDrugs = drugsData.filter((drug) => {
+        const expiryDate = drug.tgl_kadaluarsa ? new Date(drug.tgl_kadaluarsa) : null;
+        return !expiryDate || expiryDate >= new Date();
+      });
+      setDrugs(validDrugs);
     } catch (err: unknown) {
       showErrorToast("Failed to load medicines");
     }
@@ -107,6 +112,20 @@ export default function TransactionsPage() {
       showErrorToast("Gagal mengambil detail transaksi");
     } finally {
       setLoadingReceipt(false);
+    }
+  };
+
+  const handleCancelTransaction = async (id: number) => {
+    try {
+      await transactionService.cancel(id);
+      showSuccessToast('Transaction cancelled successfully');
+      await fetchToday();
+    } catch (err: unknown) {
+      let errorMessage = 'Failed to cancel transaction';
+      if (err instanceof Error && err.message.includes('already cancelled')) {
+        errorMessage = 'Transaction already cancelled';
+      }
+      showErrorToast(errorMessage);
     }
   };
 
@@ -276,7 +295,7 @@ export default function TransactionsPage() {
               <TransactionTable
                 transactions={data.transactions}
                 onViewReceipt={handleViewReceipt}
-                onCancelTransaction={(id) => {}}
+                onCancelTransaction={handleCancelTransaction}
               />
             </div>
           </>
