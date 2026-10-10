@@ -14,6 +14,12 @@ export interface User {
     username: string;
     status: UserStatus | number;
     foto: string | null;
+    must_change_password?: boolean;
+}
+
+export interface ResetPasswordResult {
+    password: string;
+    message: string;
 }
 
 export interface CreateUserRequest {
@@ -47,6 +53,7 @@ export interface LoginRequest {
 
 export interface LoginResponse {
     token: string;
+    refresh_token: string;
     user: User;
 }
 

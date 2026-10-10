@@ -4,6 +4,7 @@ import type {
     CreateUserRequest,
     UpdateUserRequest,
     UserFilterParams,
+    ResetPasswordResult,
 } from '../types/user.types';
 import type { PaginationMeta } from '../../../types/api.types';
 import { userService } from '../../../services/userService';
@@ -65,6 +66,12 @@ export const useUsers = (initialParams?: UserFilterParams) => {
         await fetchAll(params);
     };
 
+    const resetPassword = async (id: number | string): Promise<ResetPasswordResult> => {
+        const result = await userService.resetPassword(id);
+        await fetchAll(params);
+        return result;
+    };
+
     return {
         items,
         pagination,
@@ -76,5 +83,6 @@ export const useUsers = (initialParams?: UserFilterParams) => {
         createUser,
         updateUser,
         deleteUser,
+        resetPassword,
     };
 };

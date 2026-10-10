@@ -12,6 +12,7 @@ import {
     LogOut,
     ClockAlert,
     ShoppingCart,
+    FileText,
 } from 'lucide-react';
 
 import type { NavItem } from '../../types/navigation.types';
@@ -86,6 +87,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
         icon: Users,
         path: '/users',
         permission: 'user-management',
+    },
+    {
+        id: 'returns',
+        label: 'Returns Management',
+        icon: FileText,
+        path: '/returns',
+        permission: 'returns',
     },
     {
         id: 'settings',

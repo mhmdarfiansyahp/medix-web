@@ -5,6 +5,7 @@ import type {
     UpdateUserRequest,
     UserFilterParams,
     UserListResponse,
+    ResetPasswordResult,
 } from '../features/users/types/user.types';
 import type { PaginatedResponse } from '../types/api.types';
 import { encodePathParam, normalizePagination } from '../utils/api-helpers';
@@ -66,5 +67,15 @@ export const userService = {
 
     delete: async (id: number | string): Promise<void> => {
         await apiClient.delete(`${ENDPOINT}/${encodePathParam(id)}`);
+    },
+
+    resetPassword: async (id: number | string): Promise<ResetPasswordResult> => {
+        const res = await apiClient.post<{
+            status: string;
+            message: string;
+            data?: ResetPasswordResult;
+        }>(`${ENDPOINT}/${encodePathParam(id)}/reset-password`, {});
+        if (!res.data) throw new Error('Gagal mereset password user');
+        return res.data;
     },
 };

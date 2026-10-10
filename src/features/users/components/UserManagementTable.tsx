@@ -10,6 +10,7 @@ import {
     ShieldCheck,
     CreditCard,
     Store,
+    KeyRound,
 } from "lucide-react";
 
 import { isUserActive, type User } from "../types/user.types";
@@ -25,6 +26,7 @@ interface UserTableProps {
     onPageChange: (page: number) => void;
     onEdit: (user: User) => void;
     onDelete: (user: User) => void;
+    onResetPassword: (user: User) => void;
 }
 
 export const UserTable: React.FC<UserTableProps> = ({
@@ -38,6 +40,7 @@ export const UserTable: React.FC<UserTableProps> = ({
     onPageChange,
     onEdit,
     onDelete,
+    onResetPassword,
 }) => {
     const getInitials = (name: string) => {
         return name
@@ -177,6 +180,14 @@ export const UserTable: React.FC<UserTableProps> = ({
                                             title="Edit user"
                                         >
                                             <Edit3 className="w-4 h-4" />
+                                        </button>
+
+                                        <button
+                                            onClick={() => onResetPassword(user)}
+                                            className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                                            title="Reset password"
+                                        >
+                                            <KeyRound className="w-4 h-4" />
                                         </button>
 
                                         <button

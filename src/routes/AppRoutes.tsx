@@ -12,6 +12,7 @@ import ReportsPage from '../pages/ReportsPage';
 import TransactionsPage from '../pages/TransactionsPage';
 import SettingsPage from '../pages/SettingsPage';
 import UsersPage from '../pages/UsersPage';
+import ReturnsPage from '../pages/ReturnsPage';
 
 export default function AppRoutes() {
     return (
@@ -36,6 +37,7 @@ export default function AppRoutes() {
                     <Route path="/stock-alerts/low-stock" element={<StockAlertsPage />} />
                     <Route path="/stock-alerts/expiring-soon" element={<StockAlertsPage />} />
                     <Route path='/users' element={<UsersPage />} />
+                    <Route path='/returns' element={<ReturnsPage />} />
                 </Route>
             </Route>
 

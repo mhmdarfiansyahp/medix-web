@@ -113,3 +113,4 @@ Pre-existing `react-hooks/set-state-in-effect` and `@typescript-eslint/no-explic
 - Do not require slash commands to activate these defaults.
 - Stop Caveman when the user says `stop caveman` or `normal mode`.
 - Stop Ponytail when the user says `stop ponytail` or `normal mode`.
+- Respone menggunakan bahasa indo

@@ -9,7 +9,8 @@ export type RoutePermission =
     | 'reports'
     | 'user-management'
     | 'transactions'
-    | 'settings';
+    | 'settings'
+    | 'returns';
 
 const ROLE_PERMISSIONS: Record<UserRole, RoutePermission[]> = {
     admin: [
@@ -21,6 +22,7 @@ const ROLE_PERMISSIONS: Record<UserRole, RoutePermission[]> = {
         'user-management',
         'transactions',
         'settings',
+        'returns',
     ],
     kasir: ['dashboard', 'transactions', 'settings'],
     owner: ['dashboard', 'reports', 'settings'],
