@@ -108,8 +108,8 @@ export const UserModal: React.FC<UserModalProps> = ({
             setError(
                 err?.message ||
                 (isEdit
-                    ? "Gagal memperbarui user."
-                    : "Gagal membuat user.")
+                    ? "Failed to update user."
+                    : "Failed to create user.")
             );
         } finally {
             setLoading(false);
@@ -152,7 +152,7 @@ export const UserModal: React.FC<UserModalProps> = ({
                     {/* Nama */}
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                            Nama User
+                            Full Name
                         </label>
 
                         <input
@@ -162,14 +162,14 @@ export const UserModal: React.FC<UserModalProps> = ({
                             required
                             maxLength={100}
                             className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-                            placeholder="Masukkan nama user"
+                            placeholder="Enter user name"
                         />
                     </div>
 
                     {/* No Telp */}
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                            No. Telepon
+                            Phone Number
                         </label>
 
                         <input
@@ -178,7 +178,7 @@ export const UserModal: React.FC<UserModalProps> = ({
                             onChange={(e) => setNoTelp(e.target.value)}
                             maxLength={13}
                             className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-                            placeholder="Masukkan nomor telepon"
+                            placeholder="Enter phone number"
                         />
                     </div>
 
@@ -195,7 +195,7 @@ export const UserModal: React.FC<UserModalProps> = ({
                             required
                             maxLength={50}
                             className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-                            placeholder="Masukkan username"
+                            placeholder="Enter username"
                         />
                     </div>
 
@@ -205,7 +205,7 @@ export const UserModal: React.FC<UserModalProps> = ({
                             Password
                             {isEdit && (
                                 <span className="text-xs text-slate-400 ml-1">
-                                    (kosongkan jika tidak diubah)
+                                    (leave blank to keep current)
                                 </span>
                             )}
                         </label>
@@ -217,7 +217,7 @@ export const UserModal: React.FC<UserModalProps> = ({
                             required={!isEdit}
                             minLength={6}
                             className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-                            placeholder="Masukkan password"
+                            placeholder="Enter password"
                         />
                     </div>
 

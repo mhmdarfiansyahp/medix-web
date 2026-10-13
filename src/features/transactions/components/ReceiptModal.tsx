@@ -65,7 +65,7 @@ const ReceiptModal = React.forwardRef<HTMLDivElement, ReceiptModalProps>(
                         Jl. Sehat Selalu No. 45, Jakarta
                       </p>
                       <p className="text-[11px] text-slate-500">
-                        Telp: (021) 555-0123
+                        Phone: (021) 555-0123
                       </p>
                     </div>
 
@@ -73,13 +73,13 @@ const ReceiptModal = React.forwardRef<HTMLDivElement, ReceiptModalProps>(
 
                     <div className="space-y-1 text-[11px]">
                       <div className="flex justify-between gap-3">
-                        <span className="text-slate-500">No. Struk</span>
+                        <span className="text-slate-500">Receipt No.</span>
                         <span className="font-semibold">
                           {receiptNo(receiptData.id_transaksi)}
                         </span>
                       </div>
                       <div className="flex justify-between gap-3">
-                        <span className="text-slate-500">Tanggal</span>
+                        <span className="text-slate-500">Date</span>
                         <span className="font-semibold text-right">
                           {new Date(receiptData.tgl_transaksi).toLocaleString(
                             "id-ID",
@@ -94,7 +94,7 @@ const ReceiptModal = React.forwardRef<HTMLDivElement, ReceiptModalProps>(
                         </span>
                       </div>
                       <div className="flex justify-between gap-3">
-                        <span className="text-slate-500">Kasir</span>
+                        <span className="text-slate-500">Cashier</span>
                         <span className="font-semibold">
                           #{receiptData.id_user}
                         </span>
@@ -107,7 +107,7 @@ const ReceiptModal = React.forwardRef<HTMLDivElement, ReceiptModalProps>(
                       {receiptData.details.map((detail: TransactionDetail, index: number) => (
                         <div key={detail.id_detail ?? index}>
                           <p className="font-sans font-semibold text-[12px] truncate">
-                            {detail.nama_obat ?? `Obat #${detail.id_obat}`}
+                            {detail.nama_obat ?? `Medicine #${detail.id_obat}`}
                           </p>
                           <div className="flex justify-between gap-3">
                             <span className="text-slate-600">
@@ -144,16 +144,16 @@ const ReceiptModal = React.forwardRef<HTMLDivElement, ReceiptModalProps>(
 
                     <div className="text-center">
                       <p className="font-sans font-semibold text-[12px]">
-                        Terima kasih atas kunjungan Anda
+                        Thank you for your visit
                       </p>
                       <p className="mt-1 text-[10px] text-slate-500">
-                        Barang yang sudah dibeli tidak dapat dikembalikan
+                        Purchased items cannot be returned
                       </p>
                       <p className="mt-3 text-[13px] tracking-[0.3em] font-bold">
                         *{receiptData.id_transaksi}*
                       </p>
                       <p className="mt-1 text-[10px] text-slate-400">
-                        Dicetak: {printedAt}
+                        Printed: {printedAt}
                       </p>
                     </div>
                   </div>

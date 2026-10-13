@@ -108,7 +108,7 @@ Pre-existing `react-hooks/set-state-in-effect` and `@typescript-eslint/no-explic
 ## Default working styles
 
 - Always use `caveman` skill at `ultra` level for every response in this project.
-- Always use Ponytail at `full` level for every task in this project.
+- Always use `ponytail` at `full` level for every task in this project.
 - Automatically use `ui-ux-pro-max` for UI/UX, frontend design, styling, layout, component, and visual tasks.
 - Automatically use `using-agent-skills` for discovering and applying the right workflow skill for any task.
 - Do not require slash commands to activate these defaults.

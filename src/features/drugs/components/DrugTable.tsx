@@ -147,7 +147,7 @@ export function DrugTable({
                 type="button"
                 onClick={() => onEdit(drug)}
                 className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                title="Edit Data Obat"
+                title="Edit Medication"
               >
                 <Edit2 className="w-4 h-4" />
               </button>
@@ -158,7 +158,7 @@ export function DrugTable({
                 role="switch"
                 aria-checked={isActive}
                 onClick={() => !isExpired && onToggleStatus?.(drug)}
-                title={isExpired ? "Obat sudah kadaluarsa" : (isActive ? "Nonaktifkan Obat" : "Aktifkan Obat")}
+                title={isExpired ? "Medication is expired" : (isActive ? "Deactivate Medication" : "Activate Medication")}
                 className={cn(
                   "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
                   isActive ? "bg-emerald-500" : "bg-slate-300",

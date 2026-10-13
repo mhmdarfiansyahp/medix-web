@@ -91,7 +91,7 @@ export function AddMedicationModal({
         setErrorMessage(null);
 
         if (!formData.nama_obat || !formData.tgl_kadaluarsa || !formData.harga) {
-            setErrorMessage('Mohon isi field wajib (Nama Obat, Expiration Date, dan Harga).');
+            setErrorMessage('Please fill in required fields (Medication Name, Expiration Date, and Price).');
             setIsLoading(false);
             return;
         }
@@ -114,16 +114,16 @@ export function AddMedicationModal({
 
             if (isEditMode && targetId) {
                 await medicineService.update(targetId, payload);
-                showSuccessToast(`Obat berhasil diperbarui.`);
+                showSuccessToast(`Medication has been successfully updated.`);
             } else {
                 await medicineService.create(payload);
-                showSuccessToast(`Obat berhasil ditambahkan.`);
+                showSuccessToast(`Medication has been successfully added.`);
             }
 
             if (onSuccess) onSuccess();
             onClose();
         } catch (err: any) {
-            const msg = err?.response?.data?.message || err?.message || 'Gagal menyimpan data obat.';
+            const msg = err?.response?.data?.message || err?.message || 'Failed to save medication data.';
             setErrorMessage(msg);
             showErrorToast(msg);
         } finally {

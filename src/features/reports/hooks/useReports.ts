@@ -56,7 +56,7 @@ export const useReports = (): UseReportsReturn => {
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `Laporan_Penjualan_${new Date().toISOString().split('T')[0]}.xlsx`;
+            link.download = `Sales_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

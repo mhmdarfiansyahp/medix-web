@@ -8,7 +8,7 @@ import {
     XAxis,
     YAxis,
 } from 'recharts';
-import { formatCurrency } from '../../../utils/utils';
+import { formatCurrency, formatPeriodLabel } from '../../../utils/utils';
 import { reportService } from '../../../services/reportService';
 import type { ReportFilterParams, SalesChartData } from '../../../features/reports/types/report.types';
 
@@ -117,6 +117,7 @@ export function SalesChart({ data: externalData, metricType: externalMetric, onM
                                 tickLine={false}
                                 axisLine={false}
                                 tick={{ fontSize: 12, fill: '#64748b' }}
+                                tickFormatter={(value) => formatPeriodLabel(String(value))}
                             />
                             <YAxis
                                 tickLine={false}
@@ -126,6 +127,7 @@ export function SalesChart({ data: externalData, metricType: externalMetric, onM
                                 tickFormatter={(val) => formatAxisValue(Number(val), metricType)}
                             />
                             <Tooltip
+                                labelFormatter={(label) => formatPeriodLabel(String(label))}
                                 formatter={(value) =>
                                     metricType === 'revenue'
                                         ? [formatCurrency(Number(value)), 'Revenue']

@@ -88,11 +88,11 @@ export default function UsersPage() {
         try {
             await deleteUser(user.id_user);
             showSuccessToast(
-                `User "${user.nama_user}" berhasil dihapus.`
+                `User "${user.nama_user}" deleted successfully.`
             );
         } catch (error: unknown) {
             showErrorToast(
-                error instanceof Error ? error.message : "Gagal menghapus user."
+                error instanceof Error ? error.message : "Failed to delete user."
             );
         }
     };
@@ -106,7 +106,7 @@ export default function UsersPage() {
                 showErrorToast(
                     error instanceof Error
                         ? error.message
-                        : "Gagal mereset password user."
+                        : "Failed to reset user password."
                 );
             }
         });
@@ -120,8 +120,8 @@ export default function UsersPage() {
 
         showSuccessToast(
             selectedUserForEdit
-                ? "User berhasil diperbarui."
-                : "User berhasil dibuat."
+                ? "User updated successfully."
+                : "User created successfully."
         );
     };
 

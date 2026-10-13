@@ -46,15 +46,15 @@ export function ExportReportModal({ isOpen, onClose }: ExportReportModalProps) {
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `Laporan_Penjualan_${new Date().toISOString().split('T')[0]}.xlsx`;
+            link.download = `Sales_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
-            showSuccessToast(`Laporan berhasil diunduh (Excel).`);
+            showSuccessToast(`Report downloaded successfully (Excel).`);
             onClose();
         } catch (err: unknown) {
-            showErrorToast(err instanceof Error ? err.message : 'Gagal mengunduh laporan.');
+            showErrorToast(err instanceof Error ? err.message : 'Failed to download report.');
         } finally {
             setIsLoading(false);
         }

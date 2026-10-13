@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Pill, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { authService } from '../services/authService';
 
@@ -59,9 +59,17 @@ export default function LoginPage() {
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-1.5">
-                            Password
-                        </label>
+                        <div className="flex items-center justify-between mb-1.5">
+                            <label htmlFor="password" className="block text-sm font-semibold text-slate-700">
+                                Password
+                            </label>
+                            <Link
+                                to="/forgot-password"
+                                className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                            >
+                                Forgot Password?
+                            </Link>
+                        </div>
                         <div className="relative">
                             <input
                                 id="password"

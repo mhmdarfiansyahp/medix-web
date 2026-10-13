@@ -62,19 +62,6 @@ export const showTempPassword = (password: string) => {
     });
 };
 
-export const showSuccessToast = (message: string) => {
-    MySwal.fire({
-        title: 'Success!',
-        text: message,
-        icon: 'success',
-        timer: 2000,
-        showConfirmButton: false,
-        customClass: {
-            popup: 'rounded-2xl',
-        },
-    });
-};
-
 export const showToast = (
     message: string,
     icon: 'success' | 'error' | 'info' | 'warning' = 'success'
@@ -85,7 +72,7 @@ export const showToast = (
         icon,
         title: message,
         showConfirmButton: false,
-        timer: 2000,
+        timer: 3000,
         timerProgressBar: true,
         customClass: {
             popup: 'rounded-xl',
@@ -94,16 +81,9 @@ export const showToast = (
 };
 
 export const showErrorToast = (message: string) => {
-    MySwal.fire({
-        title: 'Error!',
-        text: message,
-        icon: 'error',
-        timer: 3000,
-        showConfirmButton: true,
-        confirmButtonColor: '#ef4444',
-        customClass: {
-            popup: 'rounded-2xl',
-            confirmButton: 'px-4 py-2 text-sm font-semibold rounded-xl',
-        },
-    });
+    showToast(message, 'error');
+};
+
+export const showSuccessToast = (message: string) => {
+    showToast(message, 'success');
 };

@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AlertTriangle, Clock, Package } from 'lucide-react';
-import { cn } from '../utils/utils';
+import { cn, formatPeriodLabel } from '../utils/utils';
 import { useAlerts } from '../features/drugs/hooks/useAlerts';
 
 type Tab = 'low-stock' | 'expiring-soon';
@@ -25,7 +25,7 @@ export default function StockAlertsPage() {
     if (loading) {
         return (
             <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-12 text-center text-sm text-slate-400">
-                Memuat data alert...
+                Loading alert data...
             </div>
         );
     }
@@ -47,8 +47,8 @@ export default function StockAlertsPage() {
                     </h1>
                     <p className="text-sm text-slate-500 mt-0.5">
                         {isLow
-                            ? 'Obat dengan stok di bawah batas minimum.'
-                            : 'Obat yang mendekati tanggal kadaluarsa (30 hari).'}
+                            ? 'Medicines with stock below minimum threshold.'
+                            : 'Medicines approaching expiration date (30 days).'}
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -139,8 +139,8 @@ export default function StockAlertsPage() {
                                         </div>
                                     </div>
                                     <div className="text-right shrink-0">
-                                        <div className="text-sm font-bold text-amber-600">{item.tgl_kadaluarsa}</div>
-                                        <p className="text-[11px] text-slate-400">{item.sisa_hari} hari lagi</p>
+                                        <div className="text-sm font-bold text-amber-600">{formatPeriodLabel(item.tgl_kadaluarsa)}</div>
+                                        <p className="text-[11px] text-slate-400">{item.sisa_hari} days remaining</p>
                                     </div>
                                 </div>
                             ))}
@@ -156,7 +156,7 @@ function EmptyState({ label }: { label: string }) {
     return (
         <div className="text-center py-12 text-slate-400">
             <Package className="w-10 h-10 mx-auto mb-2 text-slate-300" />
-            Tidak ada data {label}.
+            No {label} data.
         </div>
     );
 }

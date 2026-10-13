@@ -3,6 +3,7 @@ import ProtectedRoute from '../routes/ProtectedRoute';
 import MainLayout from '../components/layout/Layout';
 
 import LoginPage from '../pages/LoginPage';
+import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import UnauthorizedPage from '../pages/UnauthorizedPage';
 import DashboardPage from '../pages/DashboardPage';
 import DrugManagementPage from '../pages/DrugManagementPage';
@@ -12,13 +13,13 @@ import ReportsPage from '../pages/ReportsPage';
 import TransactionsPage from '../pages/TransactionsPage';
 import SettingsPage from '../pages/SettingsPage';
 import UsersPage from '../pages/UsersPage';
-import ReturnsPage from '../pages/ReturnsPage';
 
 export default function AppRoutes() {
     return (
         <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
             {/* Protected Routes (Harus Login) */}
@@ -37,7 +38,6 @@ export default function AppRoutes() {
                     <Route path="/stock-alerts/low-stock" element={<StockAlertsPage />} />
                     <Route path="/stock-alerts/expiring-soon" element={<StockAlertsPage />} />
                     <Route path='/users' element={<UsersPage />} />
-                    <Route path='/returns' element={<ReturnsPage />} />
                 </Route>
             </Route>
 
