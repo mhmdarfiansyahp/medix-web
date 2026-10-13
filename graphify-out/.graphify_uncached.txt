@@ -1,0 +1,14 @@
+C:\PROJECT\Medix\medix-web\01-auth.md
+C:\PROJECT\Medix\medix-web\02-obat.md
+C:\PROJECT\Medix\medix-web\03-user-management.md
+C:\PROJECT\Medix\medix-web\04-notifikasi-stok.md
+C:\PROJECT\Medix\medix-web\05-laporan-dashboard.md
+C:\PROJECT\Medix\medix-web\06-approval-transaksi.md
+C:\PROJECT\Medix\medix-web\06-transaksi.md
+C:\PROJECT\Medix\medix-web\AGENTS.md
+C:\PROJECT\Medix\medix-web\DESIGN.md
+C:\PROJECT\Medix\medix-web\README.md
+C:\PROJECT\Medix\medix-web\index.html
+C:\PROJECT\Medix\medix-web\public\favicon.svg
+C:\PROJECT\Medix\medix-web\public\icons.svg
+C:\PROJECT\Medix\medix-web\src\assets\hero.png

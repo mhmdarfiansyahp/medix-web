@@ -25,7 +25,7 @@ export default function CartModal({ isOpen, onClose, cartItems, onUpdateQuantity
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-md h-full max-h-[90vh] overflow-y-auto">
                 <div className="p-6 border-b border-slate-200 sticky top-0 bg-white z-10">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-bold text-slate-900">Keranjang Belanja</h2>
+                        <h2 className="text-xl font-bold text-slate-900">Shopping Cart</h2>
                         <button
                             onClick={onClose}
                             className="p-2 text-slate-400 hover:text-slate-600 transition-colors"
@@ -36,13 +36,13 @@ export default function CartModal({ isOpen, onClose, cartItems, onUpdateQuantity
                     {cartItems.length === 0 ? (
                         <div className="text-center py-8 text-slate-400">
                             <ShoppingCart className="w-12 h-12 mx-auto mb-2 text-slate-300" />
-                            <p>Keranjang kosong</p>
+                            <p>Your cart is empty</p>
                             <button
                                 onClick={onClose}
                                 className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors"
                             >
                                 <Plus className="w-4 h-4" />
-                                Tambah Obat
+                                Add Medicine
                             </button>
                         </div>
                     ) : (
@@ -51,7 +51,7 @@ export default function CartModal({ isOpen, onClose, cartItems, onUpdateQuantity
                             className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
                         >
                             <Plus className="w-3.5 h-3.5" />
-                            Tambah Obat
+                            Add Medicine
                         </button>
                     )}
                 </div>
@@ -62,7 +62,7 @@ export default function CartModal({ isOpen, onClose, cartItems, onUpdateQuantity
                             <div className="flex justify-between items-start mb-2">
                                 <div className="flex-1">
                                     <h3 className="font-medium text-slate-900 text-sm">{item.drug.nama_obat}</h3>
-                                    <p className="text-xs text-slate-500">Harga: {formatCurrency(item.drug.harga)}</p>
+                                    <p className="text-xs text-slate-500">Price: {formatCurrency(item.drug.harga)}</p>
                                 </div>
                                 <button
                                     onClick={() => onRemoveItem(item.id)}
@@ -120,7 +120,7 @@ export default function CartModal({ isOpen, onClose, cartItems, onUpdateQuantity
                         onClick={onClose}
                         className="w-full px-4 py-2.5 text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
                     >
-                        Lanjutkan Belanja
+                        Continue Shopping
                     </button>
                 </div>
             </div>

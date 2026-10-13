@@ -16,6 +16,7 @@ interface SalesChartProps {
     data?: SalesChartData[];
     metricType?: 'revenue' | 'volume';
     onMetricChange?: (metric: 'revenue' | 'volume') => void;
+    filterParams?: ReportFilterParams;
 }
 
 const selectCls =
@@ -28,7 +29,7 @@ function formatAxisValue(value: number, metric: 'revenue' | 'volume') {
     return `Rp${value}`;
 }
 
-export function SalesChart({ data: externalData, metricType: externalMetric, onMetricChange }: SalesChartProps) {
+export function SalesChart({ data: externalData, metricType: externalMetric, onMetricChange, filterParams }: SalesChartProps) {
     const [periodFilter, setPeriodFilter] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
     const [internalMetric, setInternalMetric] = useState<'revenue' | 'volume'>('revenue');
     const [chartData, setChartData] = useState<SalesChartData[]>([]);
@@ -43,13 +44,13 @@ export function SalesChart({ data: externalData, metricType: externalMetric, onM
     useEffect(() => {
         if (externalData) return;
 
-        const params: ReportFilterParams = { group_by: periodFilter };
+        const params: ReportFilterParams = filterParams ?? { group_by: periodFilter };
         setLoading(true);
         reportService.getSalesSummary(params)
             .then((res) => setChartData(res.chart_data ?? []))
             .catch(() => setChartData([]))
             .finally(() => setLoading(false));
-    }, [periodFilter, externalData]);
+    }, [periodFilter, externalData, filterParams]);
 
     const data = externalData ?? chartData;
     const isEmpty = !loading && data.length === 0;
@@ -64,7 +65,7 @@ export function SalesChart({ data: externalData, metricType: externalMetric, onM
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    {!externalData && (
+                    {!externalData && !filterParams && (
                         <select
                             aria-label="Group period"
                             value={periodFilter}

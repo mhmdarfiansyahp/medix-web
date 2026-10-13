@@ -13,8 +13,8 @@ export default function ReportsPage() {
 
     const handleFilterChange = (key: keyof ReportFilterParams, value: string | undefined) => {
         setFilterParams(prev => ({ ...prev, [key]: value }));
-        if (key === 'start_date' && value) setStartDate(value);
-        if (key === 'end_date' && value) setEndDate(value);
+        if (key === 'start_date') setStartDate(value ?? '');
+        if (key === 'end_date') setEndDate(value ?? '');
     };
 
     return (
@@ -91,7 +91,7 @@ export default function ReportsPage() {
                 </div>
             </div>
 
-            <SalesChart />
+            <SalesChart filterParams={filterParams} />
             <MedicationTable filterParams={filterParams} />
 
             <ExportReportModal

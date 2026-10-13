@@ -75,6 +75,24 @@ export const showSuccessToast = (message: string) => {
     });
 };
 
+export const showToast = (
+    message: string,
+    icon: 'success' | 'error' | 'info' | 'warning' = 'success'
+) => {
+    MySwal.fire({
+        toast: true,
+        position: 'top-end',
+        icon,
+        title: message,
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        customClass: {
+            popup: 'rounded-xl',
+        },
+    });
+};
+
 export const showErrorToast = (message: string) => {
     MySwal.fire({
         title: 'Error!',
