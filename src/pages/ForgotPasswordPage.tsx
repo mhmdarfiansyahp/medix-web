@@ -1,16 +1,20 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Pill, Mail, Loader2, ArrowLeft, CheckCircle2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { showSuccessToast } from '../utils/sweetalert';
+import { authService } from '../services/authService';
 
 export default function ForgotPasswordPage() {
     const navigate = useNavigate();
-    const [step, setStep] = useState<'request' | 'sent' | 'reset'>('request');
-    const [identifier, setIdentifier] = useState('');
+    const [searchParams] = useSearchParams();
+    const tokenFromUrl = searchParams.get('token');
+
+    const [step, setStep] = useState<'request' | 'sent' | 'reset'>(tokenFromUrl ? 'reset' : 'request');
+    const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // New password state (for simulated reset link / token step)
+    // New password state
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -19,15 +23,14 @@ export default function ForgotPasswordPage() {
         e.preventDefault();
         setError(null);
 
-        if (!identifier.trim()) {
-            setError('Please enter your registered email or username');
+        if (!email.trim() || !email.includes('@')) {
+            setError('Please enter a valid registered email address');
             return;
         }
 
         setLoading(true);
         try {
-            // Simulate API call for sending reset link/code with 15-30 min validity
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await authService.forgotPassword(email.trim());
             setStep('sent');
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Failed to send reset instructions.');
@@ -52,8 +55,8 @@ export default function ForgotPasswordPage() {
 
         setLoading(true);
         try {
-            // Simulate resetting password and invalidating old sessions
-            await new Promise((resolve) => setTimeout(resolve, 1200));
+            const tokenToUse = tokenFromUrl || 'simulated-token';
+            await authService.resetPasswordWithToken(tokenToUse, newPassword);
             showSuccessToast('Password reset successfully. All prior sessions invalidated.');
             navigate('/login', { replace: true });
         } catch (err: unknown) {
@@ -79,24 +82,24 @@ export default function ForgotPasswordPage() {
                         <div className="text-center mb-2">
                             <h2 className="text-lg font-bold text-slate-900">Forgot Password?</h2>
                             <p className="text-xs text-slate-500 mt-1">
-                                Enter your registered email or username and we'll send you a secure reset link (valid for 15-30 minutes).
+                                Enter your registered email and we'll send you a secure reset link (valid for 15-30 minutes).
                             </p>
                         </div>
 
                         <div>
-                            <label htmlFor="identifier" className="block text-sm font-semibold text-slate-700 mb-1.5">
-                                Email or Username
+                            <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-1.5">
+                                Email Address
                             </label>
                             <div className="relative">
                                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
                                     <Mail className="w-5 h-5" />
                                 </span>
                                 <input
-                                    id="identifier"
-                                    type="text"
-                                    value={identifier}
-                                    onChange={(e) => setIdentifier(e.target.value)}
-                                    placeholder="Enter your email or username"
+                                    id="email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="Enter your email address"
                                     className="w-full pl-11 pr-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all placeholder:text-slate-400"
                                 />
                             </div>
@@ -145,31 +148,6 @@ export default function ForgotPasswordPage() {
                             <p className="text-sm text-slate-500 mt-2">
                                 We have sent a secure password reset link to your registered email address. The link is valid for 30 minutes.
                             </p>
-                        </div>
-
-                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-left">
-                            <p className="text-xs font-semibold text-amber-800">Demo Simulation Notice:</p>
-                            <p className="text-xs text-amber-700 mt-0.5">
-                                Since this is a self-service simulation, click below to proceed directly to the new password creation screen as if you clicked the link in your email.
-                            </p>
-                        </div>
-
-                        <button
-                            type="button"
-                            onClick={() => setStep('reset')}
-                            className="w-full py-3 text-base font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/20"
-                        >
-                            Simulate Clicking Reset Link
-                        </button>
-
-                        <div>
-                            <Link
-                                to="/login"
-                                className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
-                            >
-                                <ArrowLeft className="w-4 h-4" />
-                                Return to Sign In
-                            </Link>
                         </div>
                     </div>
                 )}

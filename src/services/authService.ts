@@ -1,6 +1,6 @@
 import { apiClient, tokenStorage, userStorage } from './api';
-import type { LoginRequest, LoginResponse, User } from '../features/users/types/user.types';
-import { extractResponseData } from '../utils/api-helpers';
+import type { LoginRequest, LoginResponse, User, ForgotPasswordRequest, ResetPasswordTokenRequest } from '../features/users/types/user.types';
+import { extractResponseData, extractOkResponse } from '../utils/api-helpers';
 
 const ENDPOINT = '/users';
 
@@ -63,6 +63,24 @@ export const authService = {
         const user = extractResponseData<User>(res, 'Updated profile');
         userStorage.setUser(user);
         return user;
+    },
+
+    forgotPassword: async (email: string): Promise<void> => {
+        const payload: ForgotPasswordRequest = { identifier: email };
+        const res = await apiClient.post<{
+            status: string;
+            message: string;
+        }>(`${ENDPOINT}/forgot-password`, payload);
+        extractOkResponse(res);
+    },
+
+    resetPasswordWithToken: async (token: string, newPassword: string): Promise<void> => {
+        const payload: ResetPasswordTokenRequest = { token, new_password: newPassword };
+        const res = await apiClient.post<{
+            status: string;
+            message: string;
+        }>(`${ENDPOINT}/reset-password`, payload);
+        extractOkResponse(res);
     },
 
     getCurrentUser: (): User | null => userStorage.getUser<User>(),

@@ -20,6 +20,7 @@ export default function AppRoutes() {
             {/* Public Routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ForgotPasswordPage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
             {/* Protected Routes (Harus Login) */}

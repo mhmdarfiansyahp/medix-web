@@ -34,6 +34,7 @@ export const UserModal: React.FC<UserModalProps> = ({
     const isEdit = !!initialData;
 
     const [namaUser, setNamaUser] = useState("");
+    const [email, setEmail] = useState("");
     const [noTelp, setNoTelp] = useState("");
     const [role, setRole] = useState<UserRole>("kasir");
     const [username, setUsername] = useState("");
@@ -46,6 +47,7 @@ export const UserModal: React.FC<UserModalProps> = ({
     useEffect(() => {
         if (initialData) {
             setNamaUser(initialData.nama_user);
+            setEmail(initialData.email || "");
             setNoTelp(initialData.no_telp || "");
             setRole(initialData.role);
             setUsername(initialData.username);
@@ -53,6 +55,7 @@ export const UserModal: React.FC<UserModalProps> = ({
             setPassword("");
         } else {
             setNamaUser("");
+            setEmail("");
             setNoTelp("");
             setRole("kasir");
             setUsername("");
@@ -79,6 +82,7 @@ export const UserModal: React.FC<UserModalProps> = ({
             if (isEdit && initialData) {
                 const payload: UpdateUserRequest = {
                     nama_user: namaUser,
+                    email: email || null,
                     no_telp: noTelp || null,
                     role,
                     username,
@@ -93,6 +97,7 @@ export const UserModal: React.FC<UserModalProps> = ({
             } else {
                 const payload: CreateUserRequest = {
                     nama_user: namaUser,
+                    email: email || null,
                     no_telp: noTelp || null,
                     role,
                     username,
@@ -163,6 +168,22 @@ export const UserModal: React.FC<UserModalProps> = ({
                             maxLength={100}
                             className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                             placeholder="Enter user name"
+                        />
+                    </div>
+
+                    {/* Email */}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                            Email (optional)
+                        </label>
+
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            maxLength={100}
+                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter email address"
                         />
                     </div>
 

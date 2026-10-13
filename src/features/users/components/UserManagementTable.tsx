@@ -153,8 +153,13 @@ export const UserTable: React.FC<UserTableProps> = ({
                                                 {user.nama_user}
                                             </div>
 
-                                            <div className="text-xs text-slate-500">
-                                                @{user.username}
+                                            <div className="text-xs text-slate-500 flex flex-col gap-0.5">
+                                                <span>@{user.username}</span>
+                                                {user.email && (
+                                                    <span className="text-[10px] text-slate-400 italic">
+                                                        {user.email}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

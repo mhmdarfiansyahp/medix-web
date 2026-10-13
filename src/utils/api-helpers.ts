@@ -70,6 +70,16 @@ export function extractResponseData<T>(response: unknown, label: string): T {
     throw new Error(`${label} tidak ditemukan dalam response`);
 }
 
+// For endpoints that intentionally return data: null (e.g. forgot-password success).
+export function extractOkResponse(response: unknown): void {
+    if (!isApiResponse(response)) {
+        throw new Error('Response format invalid');
+    }
+    if (response.status !== 'success') {
+        throw new Error((response as { message?: string }).message || 'Request failed');
+    }
+}
+
 export function normalizePagination(
     backend?: { current_page?: number; total_pages?: number; total_items?: number; items_per_page?: number } | null,
     fallback?: { currentPage?: number; itemsPerPage?: number; totalItems?: number }

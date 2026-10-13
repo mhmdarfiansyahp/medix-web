@@ -9,6 +9,7 @@ export type RoleFilter = 'all' | UserRole;
 export interface User {
     id_user: number;
     nama_user: string;
+    email: string | null;
     no_telp: string | null;
     role: UserRole;
     username: string;
@@ -24,6 +25,7 @@ export interface ResetPasswordResult {
 
 export interface CreateUserRequest {
     nama_user: string;
+    email?: string | null;
     no_telp?: string | null;
     role: UserRole;
     username: string;
@@ -63,4 +65,13 @@ export interface UserFilterParams {
     search?: string;
     role?: UserRole;
     status?: string;
+}
+
+export interface ForgotPasswordRequest {
+    identifier: string; // backend DTO expects identifier field containing email
+}
+
+export interface ResetPasswordTokenRequest {
+    token: string;
+    new_password: string; // matches BE JSON payload
 }
