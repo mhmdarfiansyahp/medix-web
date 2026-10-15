@@ -40,29 +40,23 @@ export default function TransactionSubmitButton({
             )}
             aria-label={
                 totalAmount
-                    ? `Buat transaksi untuk ${formatCurrency(totalAmount)}`
-                    : 'Buat transaksi'
+                    ? `Create transaction for total amount`
+                    : 'Create transaction'
             }
         >
             {isLoading ? (
                 <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span className="hidden sm:inline">Memproses...</span>
+                    <span className="hidden sm:inline">Processing...</span>
                 </>
             ) : (
                 <>
                     <Save className="w-4 h-4" />
-                    <span className="hidden sm:inline">Buat Transaksi</span>
+                    <span>Pay Now</span>
                 </>
             )}
         </button>
     );
 }
 
-function formatCurrency(amount: number) {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-    }).format(amount);
-}
+

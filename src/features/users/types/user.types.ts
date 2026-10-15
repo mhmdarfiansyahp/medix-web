@@ -18,11 +18,6 @@ export interface User {
     must_change_password?: boolean;
 }
 
-export interface ResetPasswordResult {
-    password: string;
-    message: string;
-}
-
 export interface CreateUserRequest {
     nama_user: string;
     email?: string | null;
@@ -74,4 +69,9 @@ export interface ForgotPasswordRequest {
 export interface ResetPasswordTokenRequest {
     token: string;
     new_password: string; // matches BE JSON payload
+}
+
+export interface ChangePasswordRequest {
+    old_password: string;
+    new_password: string;
 }

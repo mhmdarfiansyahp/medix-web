@@ -7,6 +7,14 @@ export function DashboardHeader({ role }: { role: 'ADMIN' | 'OWNER' }) {
                     Welcome back, {role === 'ADMIN' ? 'Administrator' : 'Pharmacy Owner'}.
                 </p>
             </div>
+            {role === 'OWNER' && (
+                <div className="hidden md:block bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3">
+                    <p className="text-xs font-medium text-emerald-700">Today's Summary</p>
+                    <p className="text-lg font-bold text-emerald-900">
+                        {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                    </p>
+                </div>
+            )}
         </div>
     );
 }

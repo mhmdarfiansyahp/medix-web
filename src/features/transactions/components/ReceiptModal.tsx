@@ -1,7 +1,8 @@
-import React from "react";
-import { Printer, X } from "lucide-react";
+import React, { useState } from "react";
+import { Printer, X, Mail, MessageCircle } from "lucide-react";
 import type { ReceiptData, TransactionDetail } from "../types/transaction.types";
 import { formatCurrency } from "../../../utils/utils";
+import { showSuccessToast } from "../../../utils/sweetalert";
 
 interface ReceiptModalProps {
   isOpen: boolean;
@@ -17,7 +18,44 @@ function receiptNo(id: number | string) {
 
 const ReceiptModal = React.forwardRef<HTMLDivElement, ReceiptModalProps>(
   ({ isOpen, onClose, receiptData, loadingReceipt, onPrintReceipt }, ref) => {
+    const [customerPhone, setCustomerPhone] = useState("");
+    const [customerEmail, setCustomerEmail] = useState("");
+    const [showEmailInput, setShowEmailInput] = useState(false);
+    const [showWhatsappInput, setShowWhatsappInput] = useState(false);
+
     if (!isOpen) return null;
+
+    const handleSendWhatsApp = () => {
+      if (!customerPhone.trim()) {
+        alert("Please enter customer phone number");
+        return;
+      }
+      if (!receiptData) return;
+      const itemsText = receiptData.details
+        .map((d) => `- ${d.nama_obat || 'Medicine'} (${d.jumlah}x @${formatCurrency(d.harga_satuan)}) = ${formatCurrency(d.subtotal)}`)
+        .join("\n");
+      const msg = `*MEDIX PHARMACY RECEIPT*\nReceipt No: ${receiptNo(receiptData.id_transaksi)}\nDate: ${receiptData.tgl_transaksi}\n\n*Items:*\n${itemsText}\n\n*TOTAL: ${formatCurrency(receiptData.total_harga)}*\n\nThank you for your visit!`;
+      const url = `https://wa.me/${customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`;
+      window.open(url, "_blank");
+      setShowWhatsappInput(false);
+      showSuccessToast("WhatsApp receipt link generated.");
+    };
+
+    const handleSendEmail = () => {
+      if (!customerEmail.trim() || !customerEmail.includes("@")) {
+        alert("Please enter a valid email address");
+        return;
+      }
+      if (!receiptData) return;
+      const subject = encodeURIComponent(`Receipt #${receiptNo(receiptData.id_transaksi)} - Medix Pharmacy`);
+      const itemsText = receiptData.details
+        .map((d) => `${d.nama_obat || 'Medicine'} (${d.jumlah}x @${formatCurrency(d.harga_satuan)}) = ${formatCurrency(d.subtotal)}`)
+        .join("\n");
+      const body = encodeURIComponent(`MEDIX PHARMACY\n\nReceipt No: ${receiptNo(receiptData.id_transaksi)}\n\nItems:\n${itemsText}\n\nTOTAL: ${formatCurrency(receiptData.total_harga)}\n\nThank you for your visit!`);
+      window.location.href = `mailto:${customerEmail}?subject=${subject}&body=${body}`;
+      setShowEmailInput(false);
+      showSuccessToast("Email client opened.");
+    };
 
     const printedAt = new Date().toLocaleString("id-ID", {
       day: "2-digit",
@@ -159,20 +197,83 @@ const ReceiptModal = React.forwardRef<HTMLDivElement, ReceiptModalProps>(
                   </div>
                 </div>
 
-                <div className="mt-6 flex gap-3">
-                  <button
-                    onClick={onPrintReceipt}
-                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors"
-                  >
-                    <Printer className="w-4 h-4" />
-                    Print Receipt
-                  </button>
-                  <button
-                    onClick={onClose}
-                    className="px-4 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors"
-                  >
-                    Close
-                  </button>
+                <div className="mt-6 space-y-3">
+                  <div className="flex gap-3">
+                    <button
+                      onClick={onPrintReceipt}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors shadow-sm"
+                    >
+                      <Printer className="w-4 h-4" />
+                      Print Receipt
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowWhatsappInput(!showWhatsappInput);
+                        setShowEmailInput(false);
+                      }}
+                      className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 text-sm font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 rounded-xl transition-colors"
+                      title="Send via WhatsApp"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      WhatsApp
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowEmailInput(!showEmailInput);
+                        setShowWhatsappInput(false);
+                      }}
+                      className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 text-sm font-semibold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-xl transition-colors"
+                      title="Send via Email"
+                    >
+                      <Mail className="w-4 h-4" />
+                      Email
+                    </button>
+                  </div>
+
+                  {showWhatsappInput && (
+                    <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 flex gap-2 items-center animate-in fade-in duration-200">
+                      <input
+                        type="tel"
+                        value={customerPhone}
+                        onChange={(e) => setCustomerPhone(e.target.value)}
+                        placeholder="Customer WhatsApp (e.g. 08123456789)"
+                        className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                      <button
+                        onClick={handleSendWhatsApp}
+                        className="px-3 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shrink-0"
+                      >
+                        Send
+                      </button>
+                    </div>
+                  )}
+
+                  {showEmailInput && (
+                    <div className="p-3 bg-blue-50 rounded-xl border border-blue-200 flex gap-2 items-center animate-in fade-in duration-200">
+                      <input
+                        type="email"
+                        value={customerEmail}
+                        onChange={(e) => setCustomerEmail(e.target.value)}
+                        placeholder="Customer Email (e.g. name@example.com)"
+                        className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <button
+                        onClick={handleSendEmail}
+                        className="px-3 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shrink-0"
+                      >
+                        Send
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end pt-1">
+                    <button
+                      onClick={onClose}
+                      className="w-full px-4 py-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (

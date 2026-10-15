@@ -5,7 +5,6 @@ import type {
     UpdateUserRequest,
     UserFilterParams,
     UserListResponse,
-    ResetPasswordResult,
 } from '../features/users/types/user.types';
 import type { PaginatedResponse } from '../types/api.types';
 import { encodePathParam, normalizePagination } from '../utils/api-helpers';
@@ -41,7 +40,7 @@ export const userService = {
             message: string;
             data?: User;
         }>(`${ENDPOINT}/${encodePathParam(id)}`);
-        if (!res.data) throw new Error('User tidak ditemukan');
+        if (!res.data) throw new Error('User not found');
         return res.data;
     },
 
@@ -51,7 +50,7 @@ export const userService = {
             message: string;
             data?: User;
         }>(ENDPOINT, payload);
-        if (!res.data) throw new Error('Gagal membuat user');
+        if (!res.data) throw new Error('Failed to create user');
         return res.data;
     },
 
@@ -61,7 +60,7 @@ export const userService = {
             message: string;
             data?: User;
         }>(`${ENDPOINT}/${encodePathParam(id)}`, payload);
-        if (!res.data) throw new Error('Gagal memperbarui user');
+        if (!res.data) throw new Error('Failed to update user');
         return res.data;
     },
 
@@ -69,13 +68,5 @@ export const userService = {
         await apiClient.delete(`${ENDPOINT}/${encodePathParam(id)}`);
     },
 
-    resetPassword: async (id: number | string): Promise<ResetPasswordResult> => {
-        const res = await apiClient.post<{
-            status: string;
-            message: string;
-            data?: ResetPasswordResult;
-        }>(`${ENDPOINT}/${encodePathParam(id)}/reset-password`, {});
-        if (!res.data) throw new Error('Gagal mereset password user');
-        return res.data;
-    },
+
 };

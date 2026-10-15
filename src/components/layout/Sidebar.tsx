@@ -160,11 +160,16 @@ export default function Sidebar() {
                         isSidebarCollapsed ? 'justify-center' : 'justify-between'
                     }`}
                 >
-                    {!isSidebarCollapsed && (
-                        <div className="overflow-hidden">
-                            <h1 className="text-2xl font-bold text-blue-600 tracking-tight whitespace-nowrap">Medix</h1>
-                            <p className="text-xs font-medium text-slate-500 mt-0.5 whitespace-nowrap">Pharmacy Management</p>
+                    {!isSidebarCollapsed ? (
+                        <div className="flex items-center gap-2.5 overflow-hidden">
+                            <img src="/screen.svg" alt="Medix Logo" className="w-8 h-8 object-contain shrink-0" />
+                            <div>
+                                <h1 className="text-2xl font-bold text-blue-600 tracking-tight whitespace-nowrap">Medix</h1>
+                                <p className="text-xs font-medium text-slate-500 mt-0.5 whitespace-nowrap">Pharmacy Management</p>
+                            </div>
                         </div>
+                    ) : (
+                        <img src="/screen.svg" alt="Medix Logo" className="w-8 h-8 object-contain" />
                     )}
                     <button
                         type="button"

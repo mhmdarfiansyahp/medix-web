@@ -52,6 +52,8 @@ export interface TransactionDetailRequest {
 
 export interface CreateTransactionRequest {
     details: TransactionDetailRequest[];
+    metode_pembayaran?: string;
+    jumlah_bayar?: number;
 }
 
 export interface CancelTransactionResponse {

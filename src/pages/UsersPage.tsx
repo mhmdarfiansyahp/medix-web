@@ -8,8 +8,6 @@ import { UserModal } from "../features/users/components/UserModal";
 import {
     showSuccessToast,
     showErrorToast,
-    showResetPasswordConfirm,
-    showTempPassword,
 } from "../utils/sweetalert";
 import { useUsers } from "../features/users/hooks/useUsers";
 import type { User, UserStatus, UserRole } from "../features/users/types/user.types";
@@ -33,7 +31,6 @@ export default function UsersPage() {
         createUser,
         updateUser,
         deleteUser,
-        resetPassword,
     } = useUsers({
         page: 1,
         limit: 10,
@@ -97,21 +94,6 @@ export default function UsersPage() {
         }
     };
 
-    const handleResetPassword = (user: User) => {
-        showResetPasswordConfirm(user.nama_user, async () => {
-            try {
-                const result = await resetPassword(user.id_user);
-                showTempPassword(result.password);
-            } catch (error: unknown) {
-                showErrorToast(
-                    error instanceof Error
-                        ? error.message
-                        : "Failed to reset user password."
-                );
-            }
-        });
-    };
-
     const handleModalSuccess = async () => {
         await refetch();
 
@@ -170,7 +152,6 @@ export default function UsersPage() {
                 onPageChange={setCurrentPage}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                onResetPassword={handleResetPassword}
             />
 
             <UserModal

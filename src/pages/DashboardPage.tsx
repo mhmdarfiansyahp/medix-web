@@ -1,8 +1,7 @@
 // src/features/dashboard/pages/DashboardPage.tsx
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   AlertTriangle,
-  ArrowDownRight,
   ArrowUpRight,
   Banknote,
   Receipt,
@@ -12,74 +11,35 @@ import {
 import { cn, formatCurrency } from "../utils/utils";
 import { useAlerts } from "../features/drugs/hooks/useAlerts";
 import { useReports } from "../features/reports/hooks/useReports";
+import { transactionService } from "../services/transactionService";
+import type { TodayTransactionResponse } from "../features/transactions/types/transaction.types";
 
 // Import komponen-komponen Dashboard
 import { DashboardHeader } from "../features/dashboard/components/DashboardHeader";
 import { MedicationTable } from "../features/dashboard/components/MedicationTable";
 import { SalesChart } from "../features/dashboard/components/SalesChart";
 
-function Sparkline({
-  values,
-  className,
-}: {
-  values: number[];
-  className?: string;
-}) {
-  if (values.length < 2) return null;
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = max - min || 1;
-  const d = values
-    .map((v, i) => {
-      const x = (i / (values.length - 1)) * 100;
-      const y = 26 - ((v - min) / range) * 22;
-      return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(" ");
-  return (
-    <svg
-      viewBox="0 0 100 28"
-      preserveAspectRatio="none"
-      className={className}
-      aria-hidden="true"
-    >
-      <path
-        d={d}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
-  );
-}
-
 export default function DashboardPage() {
   const [currentUserRole] = useState<"ADMIN" | "OWNER">("ADMIN");
   const { lowStock, expiring, summary } = useAlerts();
   const { salesSummary, drugRanking, fetchSalesSummary, fetchDrugRanking } =
     useReports();
+  const [todayData, setTodayData] = useState<TodayTransactionResponse | null>(null);
+
+  const fetchToday = useCallback(async () => {
+    try {
+      const res = await transactionService.getToday();
+      setTodayData(res);
+    } catch {
+      setTodayData(null);
+    }
+  }, []);
 
   useEffect(() => {
-    fetchSalesSummary({ group_by: "monthly" });
+    fetchSalesSummary({ group_by: "daily" });
     fetchDrugRanking();
-  }, [fetchSalesSummary, fetchDrugRanking]);
-
-  const sparkValues = useMemo(
-    () => (salesSummary?.chart_data ?? []).map((d) => d.total_penjualan),
-    [salesSummary]
-  );
-
-  const revenueTrend = useMemo(() => {
-    const chart = salesSummary?.chart_data ?? [];
-    if (chart.length < 2) return null;
-    const prev = chart[chart.length - 2].total_penjualan;
-    const curr = chart[chart.length - 1].total_penjualan;
-    if (prev <= 0) return null;
-    return ((curr - prev) / prev) * 100;
-  }, [salesSummary]);
+    fetchToday();
+  }, [fetchSalesSummary, fetchDrugRanking, fetchToday]);
 
   const dashboardAlerts = [
     ...lowStock.slice(0, 3).map((item) => ({
@@ -112,54 +72,28 @@ export default function DashboardPage() {
 
       {/* 2. Key Metrics — asymmetric: revenue hero + two compact stats */}
       <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        <article className="md:col-span-2 relative overflow-hidden rounded-2xl bg-slate-900 px-6 pt-5 pb-10 shadow-sm">
+        <article className="md:col-span-2 relative overflow-hidden rounded-2xl bg-slate-900 px-6 py-5 shadow-sm flex flex-col justify-between">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                 <Banknote className="h-3.5 w-3.5" aria-hidden="true" />
-                Total Revenue
+                Today's Revenue
               </p>
               <p className="mt-2 truncate text-3xl font-semibold tabular-nums tracking-tight text-white">
-                {formatCurrency(salesSummary?.total_penjualan ?? 0)}
+                {formatCurrency(todayData?.summary.total_penjualan ?? 0)}
               </p>
             </div>
-            {revenueTrend !== null && (
-              <span
-                className={cn(
-                  "inline-flex shrink-0 items-center gap-0.5 rounded-full px-2.5 py-1 text-xs font-bold tabular-nums",
-                  revenueTrend >= 0
-                    ? "bg-emerald-500/15 text-emerald-400"
-                    : "bg-rose-500/15 text-rose-400"
-                )}
-              >
-                {revenueTrend >= 0 ? (
-                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-                ) : (
-                  <ArrowDownRight className="h-3.5 w-3.5" aria-hidden="true" />
-                )}
-                {Math.abs(revenueTrend).toFixed(1)}%
-              </span>
-            )}
           </div>
-          {revenueTrend !== null && (
-            <p className="mt-1 text-xs text-slate-400">vs previous period</p>
-          )}
-          {sparkValues.length >= 2 && (
-            <Sparkline
-              values={sparkValues}
-              className="absolute inset-x-6 bottom-3 h-8 text-emerald-400/60"
-            />
-          )}
         </article>
 
         <article className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm flex flex-col justify-between">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Transactions
+                Today's Transactions
               </p>
               <p className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-slate-900">
-                {salesSummary?.total_transaksi ?? 0}
+                {todayData?.summary.total_transaksi ?? 0}
               </p>
             </div>
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
@@ -167,7 +101,7 @@ export default function DashboardPage() {
             </span>
           </div>
           <p className="mt-3 text-xs text-slate-400">
-            Invoices recorded in current period
+            Invoices recorded today
           </p>
         </article>
 

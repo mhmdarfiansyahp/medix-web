@@ -1,5 +1,5 @@
 import { apiClient, tokenStorage, userStorage } from './api';
-import type { LoginRequest, LoginResponse, User, ForgotPasswordRequest, ResetPasswordTokenRequest } from '../features/users/types/user.types';
+import type { LoginRequest, LoginResponse, User, ForgotPasswordRequest, ResetPasswordTokenRequest, ChangePasswordRequest } from '../features/users/types/user.types';
 import { extractResponseData, extractOkResponse } from '../utils/api-helpers';
 
 const ENDPOINT = '/users';
@@ -80,6 +80,14 @@ export const authService = {
             status: string;
             message: string;
         }>(`${ENDPOINT}/reset-password`, payload);
+        extractOkResponse(res);
+    },
+
+    changePassword: async (payload: ChangePasswordRequest): Promise<void> => {
+        const res = await apiClient.post<{
+            status: string;
+            message: string;
+        }>(`${ENDPOINT}/profile/password`, payload);
         extractOkResponse(res);
     },
 

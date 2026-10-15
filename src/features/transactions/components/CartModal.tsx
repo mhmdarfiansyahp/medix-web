@@ -28,7 +28,7 @@ export default function CartModal({ isOpen, onClose, cartItems, onUpdateQuantity
                         <h2 className="text-xl font-bold text-slate-900">Shopping Cart</h2>
                         <button
                             onClick={onClose}
-                            className="p-2 text-slate-400 hover:text-slate-600 transition-colors"
+                            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
                         >
                             <X className="w-5 h-5" />
                         </button>

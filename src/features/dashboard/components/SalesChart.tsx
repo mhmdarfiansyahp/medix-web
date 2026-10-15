@@ -30,7 +30,7 @@ function formatAxisValue(value: number, metric: 'revenue' | 'volume') {
 }
 
 export function SalesChart({ data: externalData, metricType: externalMetric, onMetricChange, filterParams }: SalesChartProps) {
-    const [periodFilter, setPeriodFilter] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
+    const [periodFilter, setPeriodFilter] = useState<'daily' | 'weekly' | 'monthly'>('daily');
     const [internalMetric, setInternalMetric] = useState<'revenue' | 'volume'>('revenue');
     const [chartData, setChartData] = useState<SalesChartData[]>([]);
     const [loading, setLoading] = useState(false);

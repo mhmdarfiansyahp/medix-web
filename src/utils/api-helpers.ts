@@ -46,7 +46,7 @@ export function isDefined<T>(value: T | undefined | null): value is T {
 
 export function assertDefined<T>(value: T | undefined | null, label: string): T {
     if (!isDefined(value)) {
-        throw new Error(`${label} tidak ditemukan`);
+        throw new Error(`${label} not found`);
     }
     return value;
 }
@@ -67,7 +67,7 @@ export function extractResponseData<T>(response: unknown, label: string): T {
         return response.data;
     }
 
-    throw new Error(`${label} tidak ditemukan dalam response`);
+    throw new Error(`${label} not found in response`);
 }
 
 // For endpoints that intentionally return data: null (e.g. forgot-password success).

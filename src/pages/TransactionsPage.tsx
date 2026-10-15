@@ -11,7 +11,8 @@ import type {
 import { formatCurrency } from "../utils/utils";
 import CartModal from "../features/transactions/components/CartModal";
 import ReceiptModal from "../features/transactions/components/ReceiptModal";
-import TransactionSummary from "../features/transactions/components/TransactionSummary";
+import { CheckoutModal, type PaymentMethod } from "../features/transactions/components/CheckoutModal";
+
 import TransactionTable from "../features/transactions/components/TransactionTable";
 import { showToast, showErrorToast } from "../utils/sweetalert";
 import { useReactToPrint } from "react-to-print";
@@ -31,6 +32,7 @@ export default function TransactionsPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
 
   // Ref untuk elemen yang akan dicetak
   const receiptRef = useRef<HTMLDivElement>(null);
@@ -141,7 +143,16 @@ export default function TransactionsPage() {
     }
   };
 
-  const handleCreateTransaction = async () => {
+  const handleOpenCheckout = async () => {
+    if (cartItems.length === 0) {
+      showErrorToast("Cart is empty");
+      return;
+    }
+    setShowCartModal(false);
+    setShowCheckoutModal(true);
+  };
+
+  const handleConfirmPayment = async (method: PaymentMethod, cashReceived: number) => {
     if (cartItems.length === 0) {
       showErrorToast("Cart is empty");
       return;
@@ -149,26 +160,24 @@ export default function TransactionsPage() {
 
     setIsCreating(true);
     try {
-      const payload = {
+      const res = await transactionService.create({
         details: cartItems.map((item) => ({
           id_obat: item.drug.id_obat,
           jumlah: item.quantity,
         })),
-      };
-
-      const res = await transactionService.create(payload);
-
+        metode_pembayaran: method,
+        jumlah_bayar: cashReceived,
+      });
       showToast("Transaction completed successfully");
       setCartItems([]);
-      setShowCartModal(false);
+      setShowCheckoutModal(false);
       await Promise.all([fetchToday(), fetchDrugs()]);
-
       if (res?.id_transaksi) {
         handleViewReceipt(res.id_transaksi);
       }
     } catch (err: unknown) {
       showErrorToast(
-        err instanceof Error ? err.message : "Failed to create transaction"
+        err instanceof Error ? err.message : "Failed to process payment"
       );
     } finally {
       setIsCreating(false);
@@ -192,13 +201,6 @@ export default function TransactionsPage() {
         <div className="bg-rose-50 text-rose-700 px-4 py-3 rounded-xl border border-rose-100 text-sm">
           {error}
         </div>
-      )}
-
-      {data && (
-        <TransactionSummary
-          totalTransactions={data.summary.total_transaksi}
-          totalRevenue={data.summary.total_penjualan}
-        />
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -339,11 +341,11 @@ export default function TransactionsPage() {
                     </span>
                   </div>
                   <button
-                    onClick={handleCreateTransaction}
+                    onClick={handleOpenCheckout}
                     disabled={isCreating}
                     className="w-full py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/20 disabled:opacity-50"
                   >
-                    {isCreating ? "Processing..." : "Complete Transaction"}
+                    Pay Now
                   </button>
                 </div>
               </div>
@@ -379,8 +381,16 @@ export default function TransactionsPage() {
         onRemoveItem={(id) => {
           setCartItems((prev) => prev.filter((item) => item.id !== id));
         }}
-        onCreateTransaction={handleCreateTransaction}
+        onCreateTransaction={handleOpenCheckout}
         isCreating={isCreating}
+      />
+
+      <CheckoutModal
+        isOpen={showCheckoutModal}
+        onClose={() => setShowCheckoutModal(false)}
+        totalAmount={cartItems.reduce((acc, item) => acc + item.subtotal, 0)}
+        onConfirmPayment={handleConfirmPayment}
+        isLoading={isCreating}
       />
 
       <ReceiptModal

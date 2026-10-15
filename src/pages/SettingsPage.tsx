@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Shield, Bell, Image, User as UserIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Shield, Bell, Image, User as UserIcon, Lock } from 'lucide-react';
 import { cn } from '../utils/utils';
 import { authService } from '../services/authService';
 import { useProfile } from '../features/users/hooks/useProfile';
@@ -12,14 +12,40 @@ export default function SettingsPage() {
 
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
-        name: profile?.nama_user || '',
-        phone: profile?.no_telp || '',
+        name: '',
+        email: '',
+        phone: '',
     });
-    const [photoPreview, setPhotoPreview] = useState<string | null>(profile?.foto || null);
+    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+    // Password change state
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+    const [passwordData, setPasswordData] = useState({
+        old_password: '',
+        new_password: '',
+        confirm_password: '',
+    });
+    const [passwordLoading, setPasswordLoading] = useState(false);
+
+    useEffect(() => {
+        if (profile) {
+            setFormData({
+                name: profile.nama_user || '',
+                email: profile.email || '',
+                phone: profile.no_telp || '',
+            });
+            setPhotoPreview(profile.foto || null);
+        }
+    }, [profile]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setPasswordData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,27 +58,57 @@ export default function SettingsPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsEditing(false);
 
         const payload: Partial<User> = {
             nama_user: formData.name.trim(),
+            email: formData.email.trim() || null,
             no_telp: formData.phone.trim(),
             foto: photoPreview,
         };
 
         try {
             await updateProfile(payload);
-            refetch();
-            showSuccessToast('Profil berhasil diperbarui.');
+            await refetch();
+            setIsEditing(false);
+            showSuccessToast('Profile updated successfully.');
         } catch (err: unknown) {
-            showErrorToast(err instanceof Error ? err.message : 'Gagal memperbarui profil.');
+            showErrorToast(err instanceof Error ? err.message : 'Failed to update profile.');
+        }
+    };
+
+    const handlePasswordSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (passwordData.new_password.length < 6) {
+            showErrorToast('New password must be at least 6 characters.');
+            return;
+        }
+
+        if (passwordData.new_password !== passwordData.confirm_password) {
+            showErrorToast('Password confirmation does not match.');
+            return;
+        }
+
+        setPasswordLoading(true);
+        try {
+            await authService.changePassword({
+                old_password: passwordData.old_password,
+                new_password: passwordData.new_password,
+            });
+            setPasswordData({ old_password: '', new_password: '', confirm_password: '' });
+            setIsChangingPassword(false);
+            showSuccessToast('Password changed successfully.');
+        } catch (err: unknown) {
+            showErrorToast(err instanceof Error ? err.message : 'Failed to change password.');
+        } finally {
+            setPasswordLoading(false);
         }
     };
 
     if (loading) {
         return (
             <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-12 text-center text-sm text-slate-400">
-                Memuat data profil...
+                Loading profile...
             </div>
         );
     }
@@ -81,7 +137,7 @@ export default function SettingsPage() {
                         isEditing ? 'text-rose-600 border-rose-500' : 'text-slate-500'
                     )}
                 >
-                    {isEditing ? 'Selesai' : 'Edit Profil'}
+                    {isEditing ? 'Done' : 'Edit Profile'}
                 </button>
             </div>
 
@@ -89,7 +145,7 @@ export default function SettingsPage() {
                 <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap</label>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
                             <input
                                 type="text"
                                 name="name"
@@ -102,7 +158,19 @@ export default function SettingsPage() {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">Nomor Telepon</label>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Email</label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="e.g. budi@example.com"
+                                className="w-full px-3.5 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number</label>
                             <input
                                 type="tel"
                                 name="phone"
@@ -111,20 +179,20 @@ export default function SettingsPage() {
                                 placeholder="e.g. 081234567890"
                                 className="w-full px-3.5 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 pattern="^(0|62)?8[1-9][0-9]{6,9}$"
-                                title="Masukkan nomor telepon Indonesia yang valid (misal: 081234567890)"
+                                title="Enter a valid Indonesian phone number (e.g. 081234567890)"
                                 required
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">Foto Profil</label>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Profile Photo</label>
                         <div className="flex items-center gap-3">
                             {photoPreview ? (
                                 <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-100">
                                     <img
                                         src={photoPreview}
-                                        alt="Foto profil"
+                                        alt="Profile photo"
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
@@ -147,7 +215,7 @@ export default function SettingsPage() {
                                 }
                                 className="px-3.5 py-2 text-sm text-rose-600 hover:text-rose-700 rounded-lg transition-colors font-medium"
                             >
-                                Ganti Foto
+                                Change Photo
                             </button>
                         </div>
                     </div>
@@ -165,7 +233,7 @@ export default function SettingsPage() {
                             disabled={loading}
                             className="px-4 py-2.5 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-colors shadow-sm shadow-rose-500/20 disabled:opacity-50 cursor-not-allowed"
                         >
-                            {loading ? 'Saving...' : 'Simpan Perubahan'}
+                            {loading ? 'Saving...' : 'Save Changes'}
                         </button>
                     </div>
                 </form>
@@ -207,15 +275,79 @@ export default function SettingsPage() {
                                 <p className="text-xs text-slate-500">Account protection</p>
                             </div>
                         </div>
-                        <div className="space-y-3">
-                            <p className="text-sm text-slate-600">
-                                Your account is secured with session-based authentication.
-                            </p>
-                            <p className="text-xs text-slate-400">
-                                Password management available soon.
-                            </p>
-                        </div>
+                        {isChangingPassword ? (
+                            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1">Current Password</label>
+                                    <input
+                                        type="password"
+                                        name="old_password"
+                                        value={passwordData.old_password}
+                                        onChange={handlePasswordChange}
+                                        placeholder="Enter your current password"
+                                        className="w-full px-3.5 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1">New Password</label>
+                                    <input
+                                        type="password"
+                                        name="new_password"
+                                        value={passwordData.new_password}
+                                        onChange={handlePasswordChange}
+                                        placeholder="Enter new password"
+                                        className="w-full px-3.5 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1">Confirm New Password</label>
+                                    <input
+                                        type="password"
+                                        name="confirm_password"
+                                        value={passwordData.confirm_password}
+                                        onChange={handlePasswordChange}
+                                        placeholder="Re-enter new password"
+                                        className="w-full px-3.5 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <div className="flex justify-end gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsChangingPassword(false)}
+                                        className="px-4 py-2.5 text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={passwordLoading}
+                                        className="px-4 py-2.5 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-colors shadow-sm shadow-rose-500/20 disabled:opacity-50 cursor-not-allowed"
+                                    >
+                                        {passwordLoading ? 'Saving...' : 'Change Password'}
+                                    </button>
+                                </div>
+                            </form>
+                        ) : (
+                            <div className="space-y-3">
+                                <p className="text-sm text-slate-600">
+                                    Your account is secured with session-based authentication.
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsChangingPassword(true)}
+                                    className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors"
+                                >
+                                    <Lock className="w-3.5 h-3.5" />
+                                    Change Password
+                                </button>
+                            </div>
+                        )}
                     </div>
+
+
 
                     <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
                         <div className="flex items-center gap-3 mb-4">

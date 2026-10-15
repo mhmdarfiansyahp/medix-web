@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Pill, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { authService } from '../services/authService';
 
 export default function LoginPage() {
@@ -35,8 +35,8 @@ export default function LoginPage() {
         <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12">
             <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-10">
                 <div className="flex flex-col items-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-blue-600 text-white flex items-center justify-center mb-4 shadow-lg shadow-blue-500/25">
-                        <Pill className="w-8 h-8" />
+                    <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mb-4 shadow-md shadow-blue-500/10 p-3">
+                        <img src="/screen.svg" alt="Medix Logo" className="w-full h-full object-contain" />
                     </div>
                     <h1 className="text-2xl font-bold text-slate-900">Medix</h1>
                     <p className="text-sm text-slate-500 mt-1">Pharmacy Management System</p>
