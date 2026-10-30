@@ -212,14 +212,14 @@ export function AddMedicationModal({
                         </div>
 
                         <div className="space-y-1">
-                            <label className="text-xs font-semibold text-slate-700">Barcode</label>
+                            <label className="text-xs font-semibold text-slate-700">Barcode (optional)</label>
                             <div className="relative">
                                 <input
                                     type="text"
                                     name="barcode"
                                     value={formData.barcode}
                                     onChange={handleChange}
-                                    placeholder="Scan or type barcode"
+                                    placeholder="Scan or type barcode (optional)"
                                     className="w-full pl-9 pr-3.5 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
                                 />
                                 <Barcode className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />

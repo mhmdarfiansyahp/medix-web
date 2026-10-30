@@ -1,0 +1,1095 @@
+openapi: 3.0.3
+info:
+  title: Medix BE API
+  version: 1.0.0
+  description: REST API for Medix medical service system
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Development server
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+        data:
+          type: object
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+        data:
+          type: object
+          nullable: true
+    # --- Auth ---
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserResponse'
+    RefreshRequest:
+      type: object
+      required: [refresh_token]
+      properties:
+        refresh_token:
+          type: string
+    LogoutRequest:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+    ForgotPasswordRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+    ResetPasswordWithTokenRequest:
+      type: object
+      required: [token, new_password]
+      properties:
+        token:
+          type: string
+        new_password:
+          type: string
+          format: password
+          minLength: 6
+    ChangePasswordRequest:
+      type: object
+      required: [old_password, new_password]
+      properties:
+        old_password:
+          type: string
+          format: password
+        new_password:
+          type: string
+          format: password
+          minLength: 6
+    CreateUserRequest:
+      type: object
+      required: [nama_user, role, username, password]
+      properties:
+        nama_user:
+          type: string
+          maxLength: 100
+        no_telp:
+          type: string
+          maxLength: 13
+        role:
+          type: string
+          enum: [admin, kasir, owner]
+        username:
+          type: string
+          maxLength: 50
+        password:
+          type: string
+          format: password
+          minLength: 6
+        status:
+          type: string
+          enum: [aktif, nonaktif]
+        foto:
+          type: string
+    UpdateUserRequest:
+      type: object
+      properties:
+        nama_user:
+          type: string
+          maxLength: 100
+        no_telp:
+          type: string
+          maxLength: 13
+        role:
+          type: string
+          enum: [admin, kasir, owner]
+        username:
+          type: string
+          maxLength: 50
+        password:
+          type: string
+          format: password
+          minLength: 6
+        status:
+          type: string
+          enum: [aktif, nonaktif]
+        foto:
+          type: string
+    UpdateProfileRequest:
+      type: object
+      properties:
+        nama_user:
+          type: string
+          maxLength: 100
+        no_telp:
+          type: string
+          maxLength: 13
+        username:
+          type: string
+          maxLength: 50
+        foto:
+          type: string
+    UserResponse:
+      type: object
+      properties:
+        id_user:
+          type: integer
+        nama_user:
+          type: string
+        username:
+          type: string
+        no_telp:
+          type: string
+        role:
+          type: string
+        status:
+          type: string
+        foto:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    # --- Drug Type ---
+    TypeDrugRequest:
+      type: object
+      required: [nama_jenis]
+      properties:
+        nama_jenis:
+          type: string
+          maxLength: 50
+    TypeDrugResponse:
+      type: object
+      properties:
+        id_jenis:
+          type: integer
+        nama_jenis:
+          type: string
+    # --- Medicine ---
+    CreateMedicineRequest:
+      type: object
+      required: [nama_obat, jenis_obat_id, tgl_kadaluarsa, harga, stok]
+      properties:
+        nama_obat:
+          type: string
+          maxLength: 150
+        merk_obat:
+          type: string
+          maxLength: 100
+        jenis_obat_id:
+          type: integer
+        barcode:
+          type: string
+          maxLength: 50
+        tgl_kadaluarsa:
+          type: string
+          format: date
+        harga:
+          type: number
+          format: double
+          minimum: 0
+        stok:
+          type: integer
+          minimum: 0
+        stok_minimum:
+          type: integer
+          default: 10
+        keterangan:
+          type: string
+        status:
+          type: integer
+          enum: [0, 1]
+          default: 1
+        gambar:
+          type: string
+    UpdateMedicineRequest:
+      type: object
+      properties:
+        nama_obat:
+          type: string
+          maxLength: 150
+        merk_obat:
+          type: string
+          maxLength: 100
+        jenis_obat_id:
+          type: integer
+        barcode:
+          type: string
+          maxLength: 50
+        tgl_kadaluarsa:
+          type: string
+          format: date
+        harga:
+          type: number
+          format: double
+          minimum: 0
+        stok:
+          type: integer
+          minimum: 0
+        stok_minimum:
+          type: integer
+        keterangan:
+          type: string
+        status:
+          type: integer
+          enum: [0, 1]
+        gambar:
+          type: string
+    MedicineResponse:
+      type: object
+      properties:
+        id_obat:
+          type: integer
+        nama_obat:
+          type: string
+        barcode:
+          type: string
+        harga:
+          type: number
+        stok:
+          type: integer
+        min_stok:
+          type: integer
+        status:
+          type: integer
+    # --- Transaction ---
+    CreateTransactionRequest:
+      type: object
+      required: [id_user, details]
+      properties:
+        id_user:
+          type: integer
+        details:
+          type: array
+          items:
+            type: object
+            required: [id_obat, jumlah, harga]
+            properties:
+              id_obat:
+                type: integer
+              jumlah:
+                type: integer
+                minimum: 1
+              harga:
+                type: number
+              diskon:
+                type: number
+                minimum: 0
+        metode_bayar:
+          type: string
+        uang_diterima:
+          type: number
+        kembalian:
+          type: number
+    AddToCartRequest:
+      type: object
+      required: [id_obat, jumlah]
+      properties:
+        id_obat:
+          type: integer
+        jumlah:
+          type: integer
+          minimum: 1
+    TransactionResponse:
+      type: object
+      properties:
+        id_transaksi:
+          type: integer
+        id_user:
+          type: integer
+        tanggal_transaksi:
+          type: string
+          format: date-time
+        total_harga:
+          type: number
+        metode_bayar:
+          type: string
+        uang_diterima:
+          type: number
+        kembalian:
+          type: number
+        status:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              id_transaksi_detail:
+                type: integer
+              id_obat:
+                type: integer
+              jumlah:
+                type: integer
+              harga:
+                type: number
+              nama_obat:
+                type: string
+    # --- Report ---
+    SalesChartData:
+      type: object
+      properties:
+        date:
+          type: string
+        total_penjualan:
+          type: number
+        total_transaksi:
+          type: integer
+        total_obat_terjual:
+          type: integer
+    SalesSummaryResponse:
+      type: object
+      properties:
+        total_penjualan:
+          type: number
+          format: double
+        total_transaksi:
+          type: integer
+        chart_data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesChartData'
+    DrugSalesStat:
+      type: object
+      properties:
+        id_obat:
+          type: integer
+        nama_obat:
+          type: string
+        total_terjual:
+          type: integer
+        total_omset:
+          type: number
+          format: double
+    DrugRankingResponse:
+      type: object
+      properties:
+        top_medicines:
+          type: array
+          items:
+            $ref: '#/components/schemas/DrugSalesStat'
+        bottom_medicines:
+          type: array
+          items:
+            $ref: '#/components/schemas/DrugSalesStat'
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        default: 10
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+    Role:
+      name: role
+      in: query
+      schema:
+        type: string
+        enum: [admin, kasir, owner]
+    Status:
+      name: status
+      in: query
+      schema:
+        type: string
+        enum: [aktif, nonaktif]
+    StatusStok:
+      name: status_stok
+      in: query
+      schema:
+        type: string
+        enum: [habis, menipis, tersedia]
+    Barcode:
+      name: barcode
+      in: query
+      schema:
+        type: string
+    JenisObatId:
+      name: jenis_obat_id
+      in: query
+      schema:
+        type: integer
+    UserId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    TypeDrugId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    MedicineId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    BarcodeParam:
+      name: barcode
+      in: path
+      required: true
+      schema:
+        type: string
+    TransactionId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    StartDate:
+      name: start_date
+      in: query
+      schema:
+        type: string
+        format: date
+    EndDate:
+      name: end_date
+      in: query
+      schema:
+        type: string
+        format: date
+    GroupBy:
+      name: group_by
+      in: query
+      schema:
+        type: string
+        enum: [daily, weekly, monthly]
+    ExpiringDays:
+      name: days
+      in: query
+      schema:
+        type: integer
+        default: 30
+paths:
+  # ==================== AUTH ====================
+  /users/login:
+    post:
+      tags: [Auth]
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /users/logout:
+    post:
+      tags: [Auth]
+      summary: User logout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /users/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /users/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Request password reset link
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '200':
+          description: Reset link sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /users/reset-password:
+    post:
+      tags: [Auth]
+      summary: Reset password with token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordWithTokenRequest'
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /users/profile/password:
+    post:
+      tags: [User Profile]
+      summary: Change password
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '200':
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /users:
+    post:
+      tags: [Auth]
+      summary: Create new user (public)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  # ==================== USER PROFILE ====================
+  /users/profile:
+    get:
+      tags: [User Profile]
+      summary: Get current user profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+    put:
+      tags: [User Profile]
+      summary: Update current user profile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+    post:
+      summary: Upload profile photo
+      tags: [User Profile]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [foto]
+              properties:
+                foto:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Photo uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  # ==================== USER ADMIN ====================
+  /users:
+    get:
+      tags: [User Admin]
+      summary: List all users (admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/Role'
+        - $ref: '#/components/parameters/Status'
+      responses:
+        '200':
+          description: User list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /users/{id}:
+    get:
+      tags: [User Admin]
+      summary: Get user by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags: [User Admin]
+      summary: Update user
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+    delete:
+      tags: [User Admin]
+      summary: Delete user
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: User deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  # ==================== DRUG TYPE ====================
+  /type-drugs:
+    get:
+      tags: [Drug Type]
+      summary: List all drug types
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Drug type list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+    post:
+      tags: [Drug Type]
+      summary: Create drug type
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TypeDrugRequest'
+      responses:
+        '201':
+          description: Drug type created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  # ==================== MEDICINE ====================
+  /medicines:
+    post:
+      tags: [Medicine]
+      summary: Create medicine
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMedicineRequest'
+      responses:
+        '201':
+          description: Medicine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+    get:
+      tags: [Medicine]
+      summary: List all medicines
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/JenisObatId'
+        - $ref: '#/components/parameters/StatusStok'
+      responses:
+        '200':
+          description: Medicine list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /medicines/{id}:
+    get:
+      tags: [Medicine]
+      summary: Get medicine by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MedicineId'
+      responses:
+        '200':
+          description: Medicine found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Medicine not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags: [Medicine]
+      summary: Update medicine
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MedicineId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMedicineRequest'
+      responses:
+        '200':
+          description: Medicine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+    delete:
+      tags: [Medicine]
+      summary: Delete medicine
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MedicineId'
+      responses:
+        '200':
+          description: Medicine deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /medicines/barcode/{barcode}:
+    get:
+      tags: [Medicine]
+      summary: Get medicine by barcode
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BarcodeParam'
+      responses:
+        '200':
+          description: Medicine found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Medicine not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /medicines/scan:
+    post:
+      tags: [Medicine]
+      summary: Scan medicine by barcode
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [barcode]
+              properties:
+                barcode:
+                  type: string
+      responses:
+        '200':
+          description: Medicine found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /medicines/alerts/low-stock:
+    get:
+      tags: [Medicine]
+      summary: Get low stock medicines
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Low stock medicines
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /medicines/alerts/expiring:
+    get:
+      tags: [Medicine]
+      summary: Get expiring medicines
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ExpiringDays'
+      responses:
+        '200':
+          description: Expiring medicines
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /medicines/alerts/summary:
+    get:
+      tags: [Medicine]
+      summary: Get stock summary
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Stock summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  # ==================== TRANSACTION ====================
+  /transactions:
+    post:
+      tags: [Transaction]
+      summary: Create transaction
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransactionRequest'
+      responses:
+        '201':
+          description: Transaction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+    get:
+      tags: [Transaction]
+      summary: List all transactions
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Transaction list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /transactions/add-to-cart:
+    post:
+      tags: [Transaction]
+      summary: Add medicine to cart
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddToCartRequest'
+      responses:
+        '200':
+          description: Medicine added to cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /transactions/{id}:
+    get:
+      tags: [Transaction]
+      summary: Get transaction by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TransactionId'
+      responses:
+        '200':
+          description: Transaction found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags: [Transaction]
+      summary: Cancel transaction
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TransactionId'
+      responses:
+        '200':
+          description: Transaction cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /transactions/{id}/receipt:
+    get:
+      tags: [Transaction]
+      summary: Get transaction receipt
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TransactionId'
+      responses:
+        '200':
+          description: Receipt retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  # ==================== REPORT ====================
+  /reports/sales-summary:
+    get:
+      tags: [Report]
+      summary: Get sales summary with optional grouping
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StartDate'
+        - $ref: '#/components/parameters/EndDate'
+        - $ref: '#/components/parameters/GroupBy'
+      responses:
+        '200':
+          description: Sales summary retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'

@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import type { TypeDrug, CreateTypeDrugRequest } from '../types/Category.types';
+import { showErrorToast } from '../../../utils/sweetalert';
 
 interface CategoryModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (data: CreateTypeDrugRequest) => void;
     initialData?: TypeDrug | null;
+    items?: TypeDrug[];
 }
 
 export function CategoryModal({
@@ -14,6 +16,7 @@ export function CategoryModal({
     onClose,
     onSubmit,
     initialData,
+    items,
 }: CategoryModalProps) {
     const [namaJenis, setNamaJenis] = useState('');
 
@@ -30,8 +33,33 @@ export function CategoryModal({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!namaJenis.trim()) return;
+        
+        const trimmedName = namaJenis.trim();
+        
+        // Check for duplicate category name
+        if (initialData) {
+            // For update, check if another category with the same name exists
+            const hasDuplicate = items?.some(item => 
+                item.id_jenis !== initialData.id_jenis && 
+                item.nama_jenis.toLowerCase() === trimmedName.toLowerCase()
+            );
+            if (hasDuplicate) {
+                showErrorToast('Drug type already exists');
+                return;
+            }
+        } else {
+            // For create, check if category with the same name already exists
+            const hasDuplicate = items?.some(item => 
+                item.nama_jenis.toLowerCase() === trimmedName.toLowerCase()
+            );
+            if (hasDuplicate) {
+                showErrorToast('Drug type already exists');
+                return;
+            }
+        }
+        
         onSubmit({
-            nama_jenis: namaJenis.trim(),
+            nama_jenis: trimmedName,
         });
         onClose();
     };

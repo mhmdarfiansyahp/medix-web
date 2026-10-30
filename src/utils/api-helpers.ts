@@ -34,7 +34,7 @@ export function isErrorWithMessage(error: unknown): error is { message: string }
     );
 }
 
-export function getErrorMessage(error: unknown, fallback = 'Terjadi kesalahan'): string {
+export function getErrorMessage(error: unknown, fallback = 'An error occurred'): string {
     if (error instanceof Error) return error.message;
     if (isErrorWithMessage(error)) return error.message;
     return fallback;

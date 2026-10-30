@@ -125,8 +125,7 @@ export function DrugTable({
                   isActive
                     ? "bg-emerald-100/80 text-emerald-700"
                     : "bg-slate-100 text-slate-500"
-                )}
-              >
+                )}>
                 {isActive ? "Active" : "Inactive"}
               </span>
             </div>
@@ -163,16 +162,14 @@ export function DrugTable({
                   "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
                   isActive ? "bg-emerald-500" : "bg-slate-300",
                   isExpired && "opacity-50 cursor-not-allowed"
-                )}
-                disabled={isExpired}
-              >
+                )}>
                 <span className="sr-only">Toggle Active Status</span>
                 <span
                   className={cn(
                     "pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out",
                     isActive ? "translate-x-4" : "translate-x-0"
-                  )}
-                />
+                  )}>
+                </span>
               </button>
             </div>
           );
@@ -188,11 +185,15 @@ export function DrugTable({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const safeItemsPerPage = itemsPerPage === Infinity ? drugs.length : itemsPerPage;
+  const isShowingAll = itemsPerPage === Infinity;
+  const startItem = totalItems === 0 ? 0 : (currentPage - 1) * safeItemsPerPage + 1;
   const endItem = Math.min(
-    currentPage * itemsPerPage,
+    currentPage * safeItemsPerPage,
     totalItems || drugs.length
   );
+
+  const hasPagination = !isShowingAll && (totalPages > 1 || (totalPages === 1 && totalItems > 0));
 
   if (isLoading) {
     return (
@@ -266,29 +267,37 @@ export function DrugTable({
           entries
         </div>
 
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => onPageChange?.(currentPage - 1)}
-            disabled={currentPage === 1}
-            title="Previous Page"
-            className="p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
+        {hasPagination && (
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => onPageChange?.(currentPage - 1)}
+              disabled={currentPage === 1}
+              title="Previous Page"
+              className="p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
 
-          <span className="px-3.5 py-1.5 bg-white border border-slate-200 rounded-xl text-slate-700 font-semibold shadow-sm select-none">
-            {currentPage} / {totalPages || 1}
-          </span>
+            <span className="px-3.5 py-1.5 bg-white border border-slate-200 rounded-xl text-slate-700 font-semibold shadow-sm select-none">
+              {currentPage} / {totalPages || 1}
+            </span>
 
-          <button
-            onClick={() => onPageChange?.(currentPage + 1)}
-            disabled={currentPage >= totalPages || totalPages === 0}
-            title="Next Page"
-            className="p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
+            <button
+              onClick={() => onPageChange?.(currentPage + 1)}
+              disabled={currentPage >= totalPages || totalPages === 0}
+              title="Next Page"
+              className="p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+        
+        {isShowingAll && (
+          <div className="text-xs text-slate-500">
+            All records displayed
+          </div>
+        )}
       </div>
     </div>
   );

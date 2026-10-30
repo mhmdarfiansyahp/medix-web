@@ -109,7 +109,7 @@ export default function DrugCategoriesPage() {
 
             {loading ? (
                 <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center text-slate-400">
-                    Memuat data dari server...
+                    Loading data from server...
                 </div>
             ) : (
                 <CategoryTable
@@ -132,6 +132,7 @@ export default function DrugCategoriesPage() {
                 }}
                 onSubmit={handleSubmitModal}
                 initialData={selectedCategoryForEdit}
+                items={categories}
             />
         </div>
     );

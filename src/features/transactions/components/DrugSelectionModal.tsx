@@ -127,7 +127,7 @@ function DrugSelectionModal({
                                         Harga satuan: {formatCurrency(selectedDrug.harga)}
                                     </div>
                                     <div className="text-sm text-slate-500">
-                                        Stok tersedia: {selectedDrug.stok}
+                                        Stock available: {selectedDrug.stok}
                                     </div>
                                 </div>
                                 <div className="text-right">

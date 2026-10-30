@@ -26,3 +26,7 @@ dist-ssr
 # *.md
 *.opencode/
 *.jsonc
+
+# Demo recordings
+.env.demo
+demo-out/
