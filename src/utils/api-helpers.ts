@@ -70,7 +70,6 @@ export function extractResponseData<T>(response: unknown, label: string): T {
     throw new Error(`${label} not found in response`);
 }
 
-// For endpoints that intentionally return data: null (e.g. forgot-password success).
 export function extractOkResponse(response: unknown): void {
     if (!isApiResponse(response)) {
         throw new Error('Response format invalid');

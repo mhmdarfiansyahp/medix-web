@@ -18,7 +18,6 @@ export default function SettingsPage() {
     });
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-    // Password change state
     const [isChangingPassword, setIsChangingPassword] = useState(false);
     const [passwordData, setPasswordData] = useState({
         old_password: '',
@@ -346,8 +345,6 @@ export default function SettingsPage() {
                             </div>
                         )}
                     </div>
-
-
 
                     <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
                         <div className="flex items-center gap-3 mb-4">

@@ -63,12 +63,12 @@ export interface UserFilterParams {
 }
 
 export interface ForgotPasswordRequest {
-    identifier: string; // backend DTO expects identifier field containing email
+    identifier: string; 
 }
 
 export interface ResetPasswordTokenRequest {
     token: string;
-    new_password: string; // matches BE JSON payload
+    new_password: string; 
 }
 
 export interface ChangePasswordRequest {

@@ -34,10 +34,8 @@ export default function TransactionsPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
 
-  // Ref untuk elemen yang akan dicetak
   const receiptRef = useRef<HTMLDivElement>(null);
 
-  // Setup hook react-to-print
   const handlePrint = useReactToPrint({
     contentRef: receiptRef,
     documentTitle: `Receipt-${receiptData?.id_transaksi || "transaction"}`,

@@ -59,23 +59,6 @@ export default function UsersPage() {
         setParams,
     ]);
 
-    // const filteredUsers = users.filter((user) => {
-    //     const searchValue = search.toLowerCase().trim();
-
-    //     const matchesSearch =
-    //         user.nama_user.toLowerCase().includes(searchValue) ||
-    //         user.username.toLowerCase().includes(searchValue) ||
-    //         user.id_user.toString().includes(searchValue);
-
-    //     const matchesRole =
-    //         !selectedRole || user.role === selectedRole;
-
-    //     const matchesStatus =
-    //         !selectedStatus || user.status === selectedStatus;
-
-    //     return matchesSearch && matchesRole && matchesStatus;
-    // });
-
     const handleEdit = (user: User) => {
         setSelectedUserForEdit(user);
         setIsModalOpen(true);

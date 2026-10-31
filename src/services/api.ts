@@ -139,7 +139,7 @@ class ApiClient {
                 const errorMessage = (parsed as { message?: string }).message;
                 if (errorMessage) message = errorMessage;
             } catch {
-                // Keep raw text for non-JSON error bodies (502/504 HTML, etc.)
+
             }
         }
 
@@ -167,7 +167,7 @@ class ApiClient {
                 userStorage.setUser(data.user);
                 return;
             } catch {
-                // Refresh failed, proceed to logout
+
             }
         }
         tokenStorage.clear();
@@ -216,7 +216,6 @@ class ApiClient {
 
 export const apiClient = new ApiClient();
 
-// Backward-compatible wrapper for legacy service modules during migration.
 export async function fetchClient<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const method = (options?.method as RequestMethod) || 'GET';
     const { body, ...config } = options || {};

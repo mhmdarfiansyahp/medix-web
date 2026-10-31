@@ -16,7 +16,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Helper to check if token is expired
 function isTokenExpired(token: string | null): boolean {
     if (!token) return true;
     try {

@@ -43,8 +43,7 @@ export const useUsers = (initialParams?: UserFilterParams) => {
     );
 
     useEffect(() => {
-        // Data-fetching effect: loading state is set immediately on mount/filter change.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+
         fetchAll(params);
     }, [params, fetchAll]);
 
@@ -64,8 +63,6 @@ export const useUsers = (initialParams?: UserFilterParams) => {
         await userService.delete(id);
         await fetchAll(params);
     };
-
-
 
     return {
         items,

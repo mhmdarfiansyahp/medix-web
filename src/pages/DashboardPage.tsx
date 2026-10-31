@@ -1,4 +1,4 @@
-// src/features/dashboard/pages/DashboardPage.tsx
+
 import { useState, useEffect, useCallback } from "react";
 import {
   AlertTriangle,
@@ -14,7 +14,6 @@ import { useReports } from "../features/reports/hooks/useReports";
 import { transactionService } from "../services/transactionService";
 import type { TodayTransactionResponse } from "../features/transactions/types/transaction.types";
 
-// Import komponen-komponen Dashboard
 import { DashboardHeader } from "../features/dashboard/components/DashboardHeader";
 import { MedicationTable } from "../features/dashboard/components/MedicationTable";
 import { SalesChart } from "../features/dashboard/components/SalesChart";
@@ -67,10 +66,10 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-5 pb-10">
-      {/* 1. Header & Quick Actions (Di-handle oleh komponen DashboardHeader) */}
+      {}
       <DashboardHeader role={currentUserRole} />
 
-      {/* 2. Key Metrics — asymmetric: revenue hero + two compact stats */}
+      {}
       <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         <article className="md:col-span-2 relative overflow-hidden rounded-2xl bg-slate-900 px-6 py-5 shadow-sm flex flex-col justify-between">
           <div className="flex items-start justify-between gap-4">
@@ -132,11 +131,11 @@ export default function DashboardPage() {
         </article>
       </section>
 
-      {/* 3. Chart & Inventory Sidebar Grid */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <SalesChart data={salesSummary?.chart_data ?? []} />
 
-        {/* Inventory Alerts Sidebar */}
+        {}
         <aside className="bg-white rounded-2xl border border-slate-200/80 shadow-sm flex flex-col">
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
             <div>
@@ -230,7 +229,7 @@ export default function DashboardPage() {
         </aside>
       </div>
 
-      {/* 4. TanStack Medication Performance Table */}
+      {}
       <MedicationTable
         topData={drugRanking?.top_medicines ?? []}
         bottomData={drugRanking?.bottom_medicines ?? []}

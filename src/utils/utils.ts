@@ -7,7 +7,6 @@ export function cn(...inputs: ClassValue[]) {
 
 const MONTH_ABBR = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
-// "2026-10-14T00:00:00Z" -> "14-oct-2026". String-parsed, so no timezone shift.
 export const formatPeriodLabel = (value: string) => {
   const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
   if (!match) return value;

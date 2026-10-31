@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Plus } from "lucide-react";
 
 import { DrugFilterBar } from "../features/drugs/components/DrugFilterBar";
@@ -9,6 +9,8 @@ import { showSuccessToast, showErrorToast } from "../utils/sweetalert";
 import { useMedicines } from "../features/drugs/hooks/useMedicines";
 import { useTypeDrugs } from "../features/drugs/hooks/useTypeDrugs";
 import type { Drug } from "../features/drugs/types/Drug.types";
+
+const ITEMS_PER_PAGE = 10;
 
 export default function DrugManagementPage() {
   const [search, setSearch] = useState("");
@@ -24,33 +26,38 @@ export default function DrugManagementPage() {
 
   const { items: categories, loading: categoriesLoading } = useTypeDrugs();
   const {
-    items: drugs,
+    items: allDrugs,
     loading: drugsLoading,
-    pagination,
-    setParams,
     toggleStatus,
     refetch,
-  } = useMedicines({
-    page: 1,
-    limit: 10,
-  });
+  } = useMedicines();
 
-  useEffect(() => {
-    setParams({
-      page: currentPage,
-      limit: 10,
-      search: search.trim() || undefined,
-      jenis_obat_id: selectedCategory ? Number(selectedCategory) : undefined,
-      status_stok:
-        selectedStockStatus && selectedStockStatus !== "all"
-          ? selectedStockStatus
-          : undefined,
-      status:
-        selectedStatus && selectedStatus !== "all"
-          ? selectedStatus
-          : undefined,
+  const filteredDrugs = useMemo(() => {
+    return allDrugs.filter((drug) => {
+      const matchSearch =
+        !search ||
+        drug.nama_obat.toLowerCase().includes(search.toLowerCase()) ||
+        drug.barcode?.toLowerCase().includes(search.toLowerCase());
+      const matchCategory =
+        !selectedCategory || String(drug.jenis_obat_id) === selectedCategory;
+      const matchStatus = !selectedStatus || String(drug.status) === selectedStatus;
+
+      let matchStock = true;
+      if (selectedStockStatus === "low") {
+        matchStock = drug.stok <= (drug.stok_minimum ?? 10) && drug.stok > 0;
+      } else if (selectedStockStatus === "out") {
+        matchStock = drug.stok === 0;
+      }
+
+      return matchSearch && matchCategory && matchStatus && matchStock;
     });
-  }, [search, selectedCategory, selectedStockStatus, selectedStatus, currentPage, setParams]);
+  }, [allDrugs, search, selectedCategory, selectedStockStatus, selectedStatus]);
+
+  const totalPages = Math.ceil(filteredDrugs.length / ITEMS_PER_PAGE);
+  const paginatedDrugs = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredDrugs.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredDrugs, currentPage]);
 
   const handleEdit = (drug: Drug) => {
     setSelectedDrugForEdit(drug);
@@ -140,13 +147,13 @@ export default function DrugManagementPage() {
       />
 
       <DrugTable
-        drugs={drugs}
+        drugs={paginatedDrugs}
         isLoading={drugsLoading || categoriesLoading}
         currentPage={currentPage}
-        totalPages={pagination.totalPages}
-        totalItems={pagination.totalItems}
-        itemsPerPage={pagination.itemsPerPage}
-        onPageChange={(page) => setCurrentPage(page)}
+        totalPages={totalPages}
+        totalItems={filteredDrugs.length}
+        itemsPerPage={ITEMS_PER_PAGE}
+        onPageChange={setCurrentPage}
         onEdit={handleEdit}
         onToggleStatus={handleToggleStatus}
       />

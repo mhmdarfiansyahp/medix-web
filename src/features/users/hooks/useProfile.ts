@@ -30,8 +30,7 @@ export const useProfile = (): UseProfileReturn => {
     }, []);
 
     useEffect(() => {
-        // Data-fetching effect: loading state is set immediately on mount.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+
         fetchProfile();
     }, [fetchProfile]);
 
