@@ -1,4 +1,5 @@
 export type UserRole = 'admin' | 'kasir' | 'owner';
+export type FormUserRole = UserRole | '';
 export type UserStatus = 'aktif' | 'nonaktif' | '1' | '0';
 
 export function isUserActive(status: UserStatus | number | string | unknown): boolean {

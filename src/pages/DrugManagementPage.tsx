@@ -5,7 +5,7 @@ import { DrugFilterBar } from "../features/drugs/components/DrugFilterBar";
 import { DrugTable } from "../features/drugs/components/DrugTable";
 import { AddMedicationModal } from "../features/dashboard/components/AddMedicationModal";
 
-import { showSuccessToast, showErrorToast } from "../utils/sweetalert";
+import { showSuccessToast, showErrorToast, showConfirmDialog } from "../utils/sweetalert";
 import { useMedicines } from "../features/drugs/hooks/useMedicines";
 import { useTypeDrugs } from "../features/drugs/hooks/useTypeDrugs";
 import type { Drug } from "../features/drugs/types/Drug.types";
@@ -68,6 +68,17 @@ export default function DrugManagementPage() {
     const isCurrentlyActive = Number(drug.status) === 1;
     const nextStatus = !isCurrentlyActive;
     const actionText = nextStatus ? "activated" : "deactivated";
+
+    if (isCurrentlyActive) {
+      const confirmed = await showConfirmDialog({
+        title: "Deactivate Medication?",
+        text: `Are you sure you want to deactivate "${drug.nama_obat}"? This medication will be marked as inactive.`,
+        confirmButtonText: "Yes, deactivate",
+        cancelButtonText: "Cancel",
+        isDanger: true,
+      });
+      if (!confirmed) return;
+    }
 
     try {
       await toggleStatus(drug.id_obat, nextStatus);

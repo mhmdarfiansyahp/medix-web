@@ -9,6 +9,7 @@ export type RoutePermission =
     | 'reports'
     | 'user-management'
     | 'transactions'
+    | 'transaction-history'
     | 'settings'
 
 const ROLE_PERMISSIONS: Record<UserRole, RoutePermission[]> = {
@@ -19,7 +20,7 @@ const ROLE_PERMISSIONS: Record<UserRole, RoutePermission[]> = {
         'stock-alerts',
         'reports',
         'user-management',
-        'transactions',
+        'transaction-history',
         'settings',
     ],
     kasir: ['dashboard', 'transactions', 'settings'],

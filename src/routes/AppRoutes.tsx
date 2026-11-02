@@ -42,22 +42,27 @@ export default function AppRoutes() {
                 </Route>
             </Route>
 
-            {/* Admin + Owner routes */}
+            {/* Kasir routes (transactions / POS) */}
+            <Route element={<ProtectedRoute allowedRoles={['kasir']} />}>
+                <Route element={<MainLayout />}>
+                    <Route path="/transactions" element={<TransactionsPage />} />
+                </Route>
+            </Route>
+
+            {/* Admin + Owner routes (transaction history & reports) */}
             <Route element={<ProtectedRoute allowedRoles={['admin', 'owner']} />}>
                 <Route element={<MainLayout />}>
                     <Route path="/reports" element={<ReportsPage />} />
+                    <Route path="/transaction-history" element={<TransactionsPage readOnly />} />
                 </Route>
             </Route>
 
-            {/* Admin + Kasir + Owner routes (transactions & settings) */}
+            {/* Admin + Kasir + Owner routes (settings) */}
             <Route element={<ProtectedRoute allowedRoles={['admin', 'kasir', 'owner']} />}>
                 <Route element={<MainLayout />}>
-                    <Route path="/transactions" element={<TransactionsPage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                 </Route>
             </Route>
-
-            {/* Catch-all 404 Route */}
             <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
     );

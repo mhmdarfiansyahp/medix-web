@@ -42,6 +42,9 @@ export interface Transaction {
     tgl_transaksi: string;
     total_harga: number;
     status: number;
+    metode_pembayaran?: string | null;
+    jumlah_bayar?: number | null;
+    kembalian?: number | null;
     details?: TransactionDetail[];
 }
 
@@ -54,6 +57,7 @@ export interface CreateTransactionRequest {
     details: TransactionDetailRequest[];
     metode_pembayaran?: string;
     jumlah_bayar?: number;
+    uang_diterima?: number;
 }
 
 export interface CancelTransactionResponse {
@@ -77,6 +81,10 @@ export interface ReceiptData {
     id_transaksi: number;
     tgl_transaksi: string;
     id_user: number;
+    nama_user?: string | null;
+    metode_pembayaran?: string | null;
+    jumlah_bayar?: number | null;
+    kembalian?: number | null;
     details: TransactionDetail[];
     total_harga: number;
 }

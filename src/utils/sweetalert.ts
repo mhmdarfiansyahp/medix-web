@@ -3,6 +3,31 @@ import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
 
+export const showConfirmDialog = async (options: {
+    title: string;
+    text: string;
+    confirmButtonText?: string;
+    cancelButtonText?: string;
+    isDanger?: boolean;
+}): Promise<boolean> => {
+    const result = await MySwal.fire({
+        title: options.title,
+        text: options.text,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: options.isDanger ? '#ef4444' : '#3b82f6',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: options.confirmButtonText || 'Confirm',
+        cancelButtonText: options.cancelButtonText || 'Cancel',
+        customClass: {
+            popup: 'rounded-2xl',
+            confirmButton: 'px-4 py-2 text-sm font-semibold rounded-xl',
+            cancelButton: 'px-4 py-2 text-sm font-semibold rounded-xl',
+        },
+    });
+    return result.isConfirmed;
+};
+
 export const showDeleteConfirm = (onConfirm: () => void) => {
     MySwal.fire({
         title: 'Are you sure?',

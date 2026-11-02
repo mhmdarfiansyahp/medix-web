@@ -29,19 +29,14 @@ const ALL_NAV_ITEMS: NavItem[] = [
         path: '/dashboard',
         permission: 'dashboard',
     },
-    {
-        id: 'transactions',
-        label: 'Transactions',
-        icon: ShoppingCart,
-        path: '/transactions',
-        permission: 'transactions',
-    },
+    // INVENTORY
     {
         id: 'drug-management',
         label: 'Drug Management',
         icon: Pill,
         path: '/drug-management',
         permission: 'drug-management',
+        section: 'INVENTORY',
     },
     {
         id: 'drug-categories',
@@ -49,6 +44,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
         icon: Tags,
         path: '/drug-categories',
         permission: 'drug-categories',
+        section: 'INVENTORY',
     },
     {
         id: 'stock-alerts',
@@ -57,6 +53,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
         badge: 5,
         badgeColor: 'bg-amber-100 text-amber-700',
         permission: 'stock-alerts',
+        section: 'INVENTORY',
         children: [
             {
                 id: 'low-stock',
@@ -73,19 +70,39 @@ const ALL_NAV_ITEMS: NavItem[] = [
             },
         ],
     },
+    // SALES
+    {
+        id: 'transactions',
+        label: 'Transactions',
+        icon: ShoppingCart,
+        path: '/transactions',
+        permission: 'transactions',
+        section: 'SALES',
+    },
+    {
+        id: 'transaction-history',
+        label: 'Transaction History',
+        icon: ShoppingCart,
+        path: '/transaction-history',
+        permission: 'transaction-history',
+        section: 'SALES',
+    },
     {
         id: 'reports',
         label: 'Reports & Export',
         icon: FileSpreadsheet,
         path: '/reports',
         permission: 'reports',
+        section: 'SALES',
     },
+    // ADMINISTRATION
     {
         id: 'user-management',
         label: 'User Management',
         icon: Users,
         path: '/users',
         permission: 'user-management',
+        section: 'ADMINISTRATION',
     },
     {
         id: 'settings',
@@ -93,6 +110,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
         icon: Settings,
         path: '/settings',
         permission: 'settings',
+        section: 'ADMINISTRATION',
     },
 ];
 
@@ -187,123 +205,131 @@ export default function Sidebar() {
 
                 {/* Navigation List */}
                 <nav className="space-y-1 flex-1 overflow-y-auto overflow-x-hidden pr-0.5">
-                    {navItems.map((item) => {
+                    {navItems.map((item, index) => {
                         const Icon = item.icon;
                         const hasChildren = item.children && item.children.length > 0;
+                        const showSection = item.section && item.section !== navItems[index - 1]?.section;
 
                         return (
-                            <div key={item.id} className="w-full relative group">
-                                {/* Main Menu Item */}
-                                {hasChildren ? (
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsStockOpen(!isStockOpen)}
-                                        className={`w-full flex items-center ${
-                                            isSidebarCollapsed ? 'justify-center px-2' : 'justify-between px-3.5'
-                                        } py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all duration-150 relative`}
-                                    >
-                                        <div className="flex items-center space-x-3 shrink-0">
-                                            <Icon className="w-5 h-5 text-slate-500 shrink-0" />
-                                            {!isSidebarCollapsed && (
-                                                <span className="whitespace-nowrap truncate">{item.label}</span>
-                                            )}
+                            <div key={item.id} className="w-full">
+                                {showSection && (
+                                    !isSidebarCollapsed ? (
+                                        <div className="pt-4 pb-1.5 px-3 text-[11px] font-bold text-slate-400 tracking-wider uppercase select-none">
+                                            {item.section}
                                         </div>
-
-                                        {!isSidebarCollapsed && (
-                                            <div className="flex items-center space-x-2 shrink-0">
-                                                {Boolean(item.badge) && (
-                                                    <span
-                                                        className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                                                            item.badgeColor || 'bg-slate-200 text-slate-700'
-                                                        }`}
-                                                    >
-                                                        {item.badge}
-                                                    </span>
-                                                )}
-                                                <ChevronDown
-                                                    className={`w-4 h-4 transition-transform duration-200 ${
-                                                        isStockOpen ? 'rotate-180' : ''
-                                                    } text-slate-400`}
-                                                />
-                                            </div>
-                                        )}
-
-                                        {/* Notification badge indicator on collapsed state */}
-                                        {isSidebarCollapsed && Boolean(item.badge) && (
-                                            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500" />
-                                        )}
-                                    </button>
-                                ) : (
-                                    <NavLink
-                                        to={item.path || '#'}
-                                        className={({ isActive }) =>
-                                            `w-full flex items-center ${
+                                    ) : (
+                                        <div className="my-2 border-t border-slate-200" />
+                                    )
+                                )}
+                                <div className="w-full relative group">
+                                    {/* Main Menu Item */}
+                                    {hasChildren ? (
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsStockOpen(!isStockOpen)}
+                                            className={`w-full flex items-center ${
                                                 isSidebarCollapsed ? 'justify-center px-2' : 'justify-between px-3.5'
-                                            } py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 ${
-                                                isActive
-                                                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                                                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                                            }`
-                                        }
-                                    >
-                                        {({ isActive }) => (
+                                            } py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all duration-150 relative`}
+                                        >
                                             <div className="flex items-center space-x-3 shrink-0">
-                                                <Icon
-                                                    className={`w-5 h-5 shrink-0 ${
-                                                        isActive ? 'text-white' : 'text-slate-500'
-                                                    }`}
-                                                />
+                                                <Icon className="w-5 h-5 text-slate-500 shrink-0" />
                                                 {!isSidebarCollapsed && (
                                                     <span className="whitespace-nowrap truncate">{item.label}</span>
                                                 )}
                                             </div>
-                                        )}
-                                    </NavLink>
-                                )}
 
-                                {/* Collapsed Tooltip Hover */}
-                                {isSidebarCollapsed && (
-                                    <div className="fixed left-20 ml-2 px-2.5 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none shadow-lg">
-                                        {item.label}
-                                    </div>
-                                )}
-
-                                {/* Sub-menu (Low Stock & Expiring Soon) */}
-                                {!isSidebarCollapsed && hasChildren && isStockOpen && (
-                                    <div className="ml-6 mt-1 space-y-1 border-l-2 border-slate-200 pl-2">
-                                        {item.children?.map((sub) => (
-                                            <NavLink
-                                                key={sub.id}
-                                                to={sub.path || '#'}
-                                                className={({ isActive }) =>
-                                                    `w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                                                        isActive
-                                                            ? 'bg-blue-50 text-blue-600 font-bold'
-                                                            : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-                                                    }`
-                                                }
-                                            >
-                                                <span className="flex items-center space-x-2 truncate">
-                                                    {sub.id === 'expiring-soon' && (
-                                                        <ClockAlert className="w-3.5 h-3.5 shrink-0" />
+                                            {!isSidebarCollapsed && (
+                                                <div className="flex items-center space-x-2 shrink-0">
+                                                    {Boolean(item.badge) && (
+                                                        <span
+                                                            className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                                                                item.badgeColor || 'bg-slate-200 text-slate-700'
+                                                            }`}
+                                                        >
+                                                            {item.badge}
+                                                        </span>
                                                     )}
-                                                    <span className="truncate">{sub.label}</span>
-                                                </span>
-                                                {Boolean(sub.badge) && (
-                                                    <span
-                                                        className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold shrink-0 ${
-                                                            sub.id === 'low-stock'
-                                                                ? 'bg-rose-100 text-rose-600'
-                                                                : 'bg-amber-100 text-amber-600'
+                                                    <ChevronDown
+                                                        className={`w-4 h-4 transition-transform duration-200 ${
+                                                            isStockOpen ? 'rotate-180' : ''
+                                                        } text-slate-400`}
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {/* Notification badge indicator on collapsed state */}
+                                            {isSidebarCollapsed && Boolean(item.badge) && (
+                                                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500" />
+                                            )}
+                                        </button>
+                                    ) : (
+                                        <NavLink
+                                            to={item.path || '#'}
+                                            className={({ isActive }) =>
+                                                `w-full flex items-center ${
+                                                    isSidebarCollapsed ? 'justify-center px-2' : 'justify-between px-3.5'
+                                                } py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 ${
+                                                    isActive
+                                                        ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                                                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                                                }`
+                                            }
+                                        >
+                                            {({ isActive }) => (
+                                                <div className="flex items-center space-x-3 shrink-0">
+                                                    <Icon
+                                                        className={`w-5 h-5 shrink-0 ${
+                                                            isActive ? 'text-white' : 'text-slate-500'
                                                         }`}
+                                                    />
+                                                    {!isSidebarCollapsed && (
+                                                        <span className="whitespace-nowrap truncate">{item.label}</span>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </NavLink>
+                                    )}
+
+                                    {/* Collapsed Tooltip Hover */}
+                                    {isSidebarCollapsed && (
+                                        <div className="fixed left-20 ml-2 px-2.5 py-1 bg-slate-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none shadow-lg">
+                                            {item.label}
+                                        </div>
+                                    )}
+
+                                    {/* Sub-menu (Low Stock & Expiring Soon) */}
+                                    {!isSidebarCollapsed && hasChildren && isStockOpen && (
+                                        <div className="ml-5 mt-1 space-y-0.5 pl-2">
+                                            {item.children?.map((sub, sIdx) => {
+                                                const isLast = sIdx === (item.children?.length ?? 1) - 1;
+                                                const treePrefix = isLast ? '└' : '├';
+                                                return (
+                                                    <NavLink
+                                                        key={sub.id}
+                                                        to={sub.path || '#'}
+                                                        className={({ isActive }) =>
+                                                            `w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                                                                isActive
+                                                                    ? 'bg-blue-50 text-blue-600 font-bold'
+                                                                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                                                            }`
+                                                        }
                                                     >
-                                                        {sub.badge}
-                                                    </span>
-                                                )}
-                                            </NavLink>
-                                        ))}
-                                    </div>
-                                )}
+                                                        <span className="flex items-center space-x-2 truncate">
+                                                            <span className="text-slate-400 font-mono select-none">{treePrefix}</span>
+                                                            <span className="truncate">{sub.label}</span>
+                                                        </span>
+                                                        {Boolean(sub.badge) && (
+                                                            <span className="text-xs font-medium text-slate-500 font-mono">
+                                                                ({sub.badge})
+                                                            </span>
+                                                        )}
+                                                    </NavLink>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         );
                     })}

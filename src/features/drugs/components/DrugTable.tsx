@@ -61,8 +61,7 @@ export function DrugTable({
           </thead>
           <tbody className="divide-y divide-slate-100">
             {drugs.length > 0 ? (
-              drugs.map((drug, index) => {
-                const rowNumber = (currentPage - 1) * itemsPerPage + index + 1;
+              drugs.map((drug) => {
                 const stok = drug.stok;
                 const minStok = drug.stok_minimum ?? 10;
                 const isLow = stok <= minStok && stok > 0;

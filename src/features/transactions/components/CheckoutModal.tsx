@@ -35,8 +35,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     const changeAmount = cashNum - totalAmount;
     const isCashValid = selectedMethod !== "tunai" || cashNum >= totalAmount;
 
-    const formatIDR = (val: number) =>
-        new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(val);
+    const formatIDR = (val: number) => {
+        const formatted = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(val);
+        return formatted.replace(/^Rp\s?/, "Rp ");
+    };
 
     const handleQuickCash = (amount: number) => {
         setCashReceived(amount.toString());
@@ -64,20 +66,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     </button>
                 </div>
 
-                <div className="p-6 space-y-6 overflow-y-auto max-h-[80vh]">
-                    <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-center justify-between">
+                <div className="p-6 space-y-4 overflow-y-auto max-h-[85vh]">
+                    <div className="bg-blue-50 border border-blue-100 rounded-2xl p-3.5 flex items-center justify-between">
                         <div>
                             <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Total Amount</span>
-                            <div className="text-2xl font-black text-blue-900 mt-0.5">{formatIDR(totalAmount)}</div>
+                            <div className="text-xl font-black text-blue-900 mt-0.5">{formatIDR(totalAmount)}</div>
                         </div>
-                        <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm shadow-blue-500/20">
-                            <Wallet className="w-5 h-5" />
+                        <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm shadow-blue-500/20">
+                            <Wallet className="w-4 h-4" />
                         </div>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Payment Method</label>
-                        <div className="grid grid-cols-1 gap-2.5">
+                        <div className="grid grid-cols-1 gap-2">
                             {PAYMENT_METHODS.map((method) => {
                                 const isSelected = selectedMethod === method.id;
                                 return (
@@ -85,23 +87,23 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                                         key={method.id}
                                         type="button"
                                         onClick={() => setSelectedMethod(method.id)}
-                                        className={`flex items-center justify-between p-3.5 rounded-xl border text-left transition-all ${
+                                        className={`flex items-center justify-between p-2.5 rounded-xl border text-left transition-all ${
                                             isSelected
                                                 ? "border-blue-600 bg-blue-50/50 shadow-sm ring-2 ring-blue-600/10"
                                                 : "border-slate-200 hover:border-slate-300 bg-white"
                                         }`}
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <div className={`p-2 rounded-lg ${isSelected ? "bg-white shadow-sm" : "bg-slate-50"}`}>
+                                        <div className="flex items-center gap-2.5">
+                                            <div className={`p-1.5 rounded-lg ${isSelected ? "bg-white shadow-sm" : "bg-slate-50"}`}>
                                                 {method.icon}
                                             </div>
                                             <div>
-                                                <div className="text-sm font-bold text-slate-900">{method.label}</div>
-                                                <div className="text-xs text-slate-500">{method.desc}</div>
+                                                <div className="text-xs font-bold text-slate-900">{method.label}</div>
+                                                <div className="text-[11px] text-slate-500">{method.desc}</div>
                                             </div>
                                         </div>
-                                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${isSelected ? "border-blue-600 bg-blue-600 text-white" : "border-slate-300"}`}>
-                                            {isSelected && <div className="w-2 h-2 bg-white rounded-full" />}
+                                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${isSelected ? "border-blue-600 bg-blue-600 text-white" : "border-slate-300"}`}>
+                                            {isSelected && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                                         </div>
                                     </button>
                                 );
@@ -110,7 +112,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     </div>
 
                     {selectedMethod === "tunai" && (
-                        <div className="space-y-3 p-4 bg-slate-50 rounded-2xl border border-slate-200/80 animate-in fade-in duration-200">
+                        <div className="space-y-2.5 p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 animate-in fade-in duration-200">
                             <div className="flex justify-between items-center">
                                 <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Cash Received</label>
                                 <span className="text-xs text-slate-500">Minimum {formatIDR(totalAmount)}</span>
@@ -118,30 +120,33 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                             <div className="relative">
                                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-400">Rp</span>
                                 <input
-                                    type="number"
-                                    value={cashReceived}
-                                    onChange={(e) => setCashReceived(e.target.value)}
+                                    type="text"
+                                    value={cashReceived ? Number(cashReceived).toLocaleString("id-ID") : ""}
+                                    onChange={(e) => {
+                                        const raw = e.target.value.replace(/\D/g, "");
+                                        setCashReceived(raw);
+                                    }}
                                     placeholder="0"
-                                    className="w-full pl-10 pr-4 py-2.5 text-sm font-bold bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900"
+                                    className="w-full pl-10 pr-4 py-2 text-sm font-bold bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900"
                                 />
                             </div>
 
-                            <div className="flex flex-wrap gap-2 pt-1">
+                            <div className="flex flex-wrap gap-1.5 pt-0.5">
                                 {[totalAmount, 50000, 100000, 200000].filter((v, i, arr) => v >= totalAmount && arr.indexOf(v) === i).slice(0, 4).map((amt) => (
                                     <button
                                         key={amt}
                                         type="button"
                                         onClick={() => handleQuickCash(amt)}
-                                        className="px-3 py-1.5 bg-white border border-slate-200 hover:border-blue-300 hover:bg-blue-50 rounded-lg text-xs font-semibold text-slate-700 transition-colors shadow-sm"
+                                        className="px-2.5 py-1 bg-white border border-slate-200 hover:border-blue-300 hover:bg-blue-50 rounded-lg text-xs font-semibold text-slate-700 transition-colors shadow-sm"
                                     >
                                         {formatIDR(amt)}
                                     </button>
                                 ))}
                             </div>
 
-                            <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                            <div className="pt-1.5 border-t border-slate-200 flex items-center justify-between">
                                 <span className="text-xs font-semibold text-slate-600">Change:</span>
-                                <span className={`text-sm font-black ${changeAmount >= 0 ? "text-emerald-600" : "text-rose-500"}`}>
+                                <span className={`text-xs font-black ${changeAmount >= 0 ? "text-emerald-600" : "text-rose-500"}`}>
                                     {changeAmount >= 0 ? formatIDR(changeAmount) : "Insufficient " + formatIDR(Math.abs(changeAmount))}
                                 </span>
                             </div>

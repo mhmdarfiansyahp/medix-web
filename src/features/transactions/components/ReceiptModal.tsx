@@ -134,7 +134,7 @@ const ReceiptModal = React.forwardRef<HTMLDivElement, ReceiptModalProps>(
                       <div className="flex justify-between gap-3">
                         <span className="text-slate-500">Cashier</span>
                         <span className="font-semibold">
-                          #{receiptData.id_user}
+                          {receiptData.nama_user ? receiptData.nama_user : `#${receiptData.id_user}`}
                         </span>
                       </div>
                     </div>
@@ -177,6 +177,29 @@ const ReceiptModal = React.forwardRef<HTMLDivElement, ReceiptModalProps>(
                       )}{" "}
                       item
                     </p>
+
+                    <div className="my-4 border-t-2 border-dashed border-slate-300" />
+
+                    <div className="space-y-1 text-[11px] font-sans">
+                      <div className="flex justify-between gap-3">
+                        <span className="text-slate-500">Payment Method</span>
+                        <span className="font-semibold uppercase">
+                          {receiptData.metode_pembayaran || 'Cash'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between gap-3">
+                        <span className="text-slate-500">Cash Received</span>
+                        <span className="font-semibold">
+                          {formatCurrency(receiptData.jumlah_bayar && receiptData.jumlah_bayar > 0 ? receiptData.jumlah_bayar : (receiptData.total_harga + (receiptData.kembalian ?? 0)))}
+                        </span>
+                      </div>
+                      <div className="flex justify-between gap-3">
+                        <span className="text-slate-500">Change</span>
+                        <span className="font-semibold">
+                          {formatCurrency(receiptData.kembalian ?? Math.max(0, (receiptData.jumlah_bayar && receiptData.jumlah_bayar > 0 ? receiptData.jumlah_bayar : receiptData.total_harga) - receiptData.total_harga))}
+                        </span>
+                      </div>
+                    </div>
 
                     <div className="my-4 border-t-2 border-dashed border-slate-300" />
 

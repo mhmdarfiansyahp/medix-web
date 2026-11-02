@@ -18,4 +18,5 @@ export interface NavItem {
     badgeColor?: string;
     children?: SubNavItem[];
     permission?: RoutePermission;
+    section?: string;
 }
